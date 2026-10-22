@@ -40,11 +40,11 @@ const ALLOWED_SCANS: Record<string, string> = {
     "places/places.sql.ts:FIND_PLACES": "admin only; walks places_created newest first and stops at 1000",
 };
 
-const modules = import.meta.glob<Record<string, unknown>>("../src/modules/**/*.sql.ts", { eager: true });
+const modules = import.meta.glob<Record<string, unknown>>(["../src/modules/**/*.sql.ts", "../src/realtime/*.sql.ts"], { eager: true });
 const statements = Object.entries(modules).flatMap(([file, exports]) =>
     Object.entries(exports)
         .filter((entry): entry is [string, string] => typeof entry[1] === "string" && /\b(SELECT|UPDATE|DELETE)\b/i.test(entry[1]))
-        .map(([name, sql]) => ({ name: `${file.replace("../src/modules/", "")}:${name}`, sql })),
+        .map(([name, sql]) => ({ name: `${file.replace("../src/modules/", "").replace("../src/", "")}:${name}`, sql })),
 );
 
 /** How many values a statement binds: the highest `?N`, or one per bare `?`. */

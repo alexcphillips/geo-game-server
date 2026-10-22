@@ -8,7 +8,6 @@ import {
     type GeoMyFeedbackResponse,
     type GeoSocketServerMessage,
 } from "@geo/shared";
-import { pool } from "../db";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -19,7 +18,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  *
  * Announcements are everyone's, so the ones made here are deleted at the end.
  */
-const { call, registerPlayer, openSocket, stop } = await startSmokeServer();
+const { call, registerPlayer, openSocket, sql, makeAdmin, stop } = await startSmokeServer();
 const announcementIds: string[] = [];
 
 const inbox = async (token: string) => (await call<GeoInboxResponse>("GET", GEO_API_PATHS.inbox.root, token)).body;
@@ -33,7 +32,7 @@ async function badge(token: string): Promise<number> {
 
 try {
     const admin = await registerPlayer("in-admin");
-    await pool.query(`UPDATE geo.players SET role = 'admin' WHERE id = $1`, [admin.player.id]);
+    await makeAdmin(admin.player.id);
     const player = await registerPlayer("in-player");
     const a = admin.accessToken;
     const p = player.accessToken;
@@ -134,8 +133,8 @@ try {
     assert.equal((await call("DELETE", deletePath, a)).status, 404);
     step("deleting an announcement takes it out of every inbox");
 } finally {
-    if (announcementIds.length > 0) await pool.query(`DELETE FROM geo.announcements WHERE id = ANY($1)`, [announcementIds]);
+    if (announcementIds.length > 0) await sql(`DELETE FROM announcements WHERE id IN (SELECT value FROM json_each(?))`, [JSON.stringify(announcementIds)]);
     // Feedback outlives its player (unsigned), so the test's own goes too.
-    await pool.query(`DELETE FROM geo.feedback WHERE title = 'Map goes black' AND app_version = '1.0.0' AND platform = 'ios 18.1'`);
+    await sql(`DELETE FROM feedback WHERE title = 'Map goes black' AND app_version = '1.0.0' AND platform = 'ios 18.1'`);
     await stop();
 }

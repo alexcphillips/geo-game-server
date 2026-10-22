@@ -8,7 +8,7 @@ geo-game's backend. The app is `../geo-game`. Start with `server/src/README.md` 
 ## Checking work
 
 - `npm run check`: data index up to date, typecheck (all workspaces), eslint, `npm test` (server + Worker), then `geo:data`.
-- `npm run smoke:geo-<area> --workspace @geo/server` runs an end-to-end suite against the dev database (throwaway accounts, cleaned up). The list is in `server/package.json`.
+- `npm run smoke:geo-<area> --workspace @geo/server` runs an end-to-end suite against the Worker: `npm run dev:worker` (localhost:8787) first, or `-- --url <base>` for workers.dev (throwaway accounts, cleaned up; needs GEO_OPS_SECRET in `.env`). The list is in `server/package.json`.
 - `npm run geo:data --workspace @geo/server` checks content alone.
 
 ## Conventions

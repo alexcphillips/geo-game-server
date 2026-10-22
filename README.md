@@ -25,7 +25,7 @@ geo-game-server/
 | --- | --- |
 | `npm run check` | data index, typecheck every workspace, eslint, server and Worker tests, then the content check |
 | `npm test` | server unit tests (no database needed) and Worker tests (in workerd) |
-| `npm run smoke:geo-<area> --workspace @geo/server` | an end-to-end suite against the dev database; the list is in `server/package.json` |
+| `npm run smoke:geo-<area> --workspace @geo/server` | an end-to-end suite against the Worker (`npm run dev:worker` first, or `-- --url <base>`); the list is in `server/package.json` |
 
 Content (cards, items, enemies, tuning) is in `server/src/data/`; start with
 its README.

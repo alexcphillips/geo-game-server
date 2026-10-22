@@ -55,7 +55,17 @@ import * as playerRepository from "../player/player.repository";
 import { recordQuestEvents } from "../quests/quests.repository";
 import { autoSwap } from "../wardrobe/wardrobe.repository";
 import * as worldRepository from "../world/world.repository";
-import { ABANDON_STALE_RUN, FIND_ACTIVE_RUN, FIND_BATTLE_ROWS, FIND_RUN, INSERT_RUN, SET_TURN_CLOCK, UPDATE_RUN, UPDATE_RUN_STATE } from "./runs.sql.ts";
+import {
+    ABANDON_STALE_RUN,
+    FIND_ACTIVE_RUN,
+    FIND_BATTLE_ROWS,
+    FIND_RECENT_SHARED_RUN,
+    FIND_RUN,
+    INSERT_RUN,
+    SET_TURN_CLOCK,
+    UPDATE_RUN,
+    UPDATE_RUN_STATE,
+} from "./runs.sql.ts";
 import type { RunRecord, RunRow } from "./runs.types";
 import { toRunView } from "./runs.view";
 
@@ -114,6 +124,20 @@ export function assertNotInRun(db: Db, playerId: string, message: string) {
 export function findActiveRun(db: Db, playerId: string): GeoRunResponse | null {
     const row = findLiveRun(db, playerId);
     return row && row.kind === "combat" ? { run: toRunView(parseRun(row)), log: [] } : null;
+}
+
+/** A shared fight that ended this long ago still goes to a socket on connect: how it ended, if they missed it. */
+const SHARED_RESULT_MS = 10 * 60_000;
+
+/** The player's shared fight, going or just ended, with an empty log: for a socket's (re)connect. */
+export function findRecentSharedRun(db: Db, playerId: string, now = Date.now()): GeoRunResponse | null {
+    const row = db.one<RunRecord>(FIND_RECENT_SHARED_RUN, playerId, now - SHARED_RESULT_MS);
+    return row ? { run: toRunView(parseRun(row)), log: [] } : null;
+}
+
+/** The shared fight the player is in, if any: its clock reads their presence. Uses `runs_one_active`. */
+export function findPlayerBattle(db: Db, playerId: string): string | null {
+    return db.one<RunRecord>(FIND_ACTIVE_RUN, playerId)?.battle_id ?? null;
 }
 
 /** The player's gear, talismans, active pet, combat hand and lunchbox, as the engine needs them. */

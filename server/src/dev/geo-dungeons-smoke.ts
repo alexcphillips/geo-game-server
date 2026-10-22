@@ -12,9 +12,6 @@ import {
     type GeoRunResponse,
     type GeoStartDungeonLobbyResponse,
 } from "@geo/shared";
-import { pool } from "../db";
-import { withTransaction } from "../db/transaction";
-import { addCoins } from "../modules/player/geo-player.repository";
 import { OFFLINE_GRACE_MS } from "../realtime/geo-socket-hub";
 import { startSmokeServer, step } from "./smoke-kit";
 
@@ -27,7 +24,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * two shares one map, hearing each other over the geo socket.
  * `npm run smoke:geo-dungeons`.
  */
-const { call, registerPlayer, grant, openSocket, stop } = await startSmokeServer();
+const { call, registerPlayer, grant, openSocket, sql, coins, stop } = await startSmokeServer();
 
 const HERE = { latitude: 51.5007, longitude: -0.1246 };
 const isType =
@@ -108,8 +105,8 @@ try {
     }
 
     const coinsNow = async () =>
-        Number((await pool.query<{ coins: string }>(`SELECT coins FROM geo.players WHERE id = $1`, [player.id])).rows[0]!.coins);
-    await withTransaction((tx) => addCoins(tx, player.id, 120, "admin-grant", "dungeons-smoke"));
+        (await sql<{ coins: number }>(`SELECT coins FROM players WHERE id = ?`, [player.id]))[0]!.coins;
+    await coins(player.id, 120);
 
     /** Walks the map: anything seen and not done, the boss last, every fight played card by card. */
     async function walk() {
@@ -151,8 +148,8 @@ try {
                 if (now) map = now.dungeonRun;
                 else {
                     // Over: read how it ended.
-                    const last = await pool.query<{ status: string }>(`SELECT status FROM geo.dungeon_runs WHERE id = $1`, [map.id]);
-                    map = { ...map, status: last.rows[0]!.status as GeoDungeonRunView["status"] };
+                    const [last] = await sql<{ status: string }>(`SELECT status FROM dungeon_runs WHERE id = ?`, [map.id]);
+                    map = { ...map, status: last!.status as GeoDungeonRunView["status"] };
                 }
             }
             if (map.puzzle) {
@@ -202,17 +199,14 @@ try {
         ["mainHand", "venomfang-dagger"],
         ["legs", "ragged-pants"],
     ] as const) {
-        const row = await pool.query<{ id: string }>(`SELECT id FROM geo.inventory WHERE player_id = $1 AND item_id = $2`, [
-            player.id,
-            itemId,
-        ]);
-        const equipped = await call("PUT", GEO_API_PATHS.me.equipmentSlot.replace(":slot", slot), token, { inventoryId: row.rows[0]!.id });
+        const [row] = await sql<{ id: string }>(`SELECT id FROM inventory WHERE player_id = ? AND item_id = ?`, [player.id, itemId]);
+        const equipped = await call("PUT", GEO_API_PATHS.me.equipmentSlot.replace(":slot", slot), token, { inventoryId: row!.id });
         assert.equal(equipped.status, 200, JSON.stringify(equipped.body));
     }
     // Run 1 ate the starter bread; a player would restock at camp first.
     const restock = () =>
-        pool.query(
-            `INSERT INTO geo.lunchbox (player_id, slot, item_id, quantity) VALUES ($1, 0, 'bread', 5)
+        sql(
+            `INSERT INTO lunchbox (player_id, slot, item_id, quantity) VALUES (?, 0, 'bread', 5)
              ON CONFLICT (player_id, slot) DO UPDATE SET item_id = 'bread', quantity = 5`,
             [player.id],
         );
@@ -319,8 +313,8 @@ try {
         assert.equal(hostNow.dungeonRun.status, "active", "the host plays on after the friend leaves");
         await call("POST", paths.leave.replace(":dungeonRunId", shared.id), token);
     }
-    const over = await pool.query<{ status: string }>(`SELECT status FROM geo.dungeon_runs WHERE id = $1`, [shared.id]);
-    assert.equal(over.rows[0]!.status, "failed");
+    const [over] = await sql<{ status: string }>(`SELECT status FROM dungeon_runs WHERE id = ?`, [shared.id]);
+    assert.equal(over!.status, "failed");
     step("one leaving doesn't end it for the other; it's over once both are out");
 
     // ---- The boss's ready-up.
@@ -339,17 +333,15 @@ try {
         const view = go.body.dungeonRun!;
         if (clearStars) {
             // Everything explored and every shared room cleared, as if the party had played it.
-            const { rows } = await pool.query<{ map: { rooms: { id: number; kind: string; wingOf: number[] }[] }; state: Record<string, unknown> }>(
-                `SELECT map, state FROM geo.dungeon_runs WHERE id = $1`,
-                [view.id],
-            );
-            const rooms = rows[0]!.map.rooms.filter((room) => room.wingOf.length === 0);
+            const [row] = await sql<{ map: string; state: string }>(`SELECT map, state FROM dungeon_runs WHERE id = ?`, [view.id]);
+            const stored = JSON.parse(row!.state) as Record<string, unknown>;
+            const rooms = (JSON.parse(row!.map) as { rooms: { id: number; kind: string; wingOf: number[] }[] }).rooms.filter((room) => room.wingOf.length === 0);
             const state = {
-                ...rows[0]!.state,
+                ...stored,
                 visited: rooms.map((room) => room.id),
                 done: rooms.filter((room) => !["boss", "loot", "event", "entrance"].includes(room.kind)).map((room) => room.id),
             };
-            await pool.query(`UPDATE geo.dungeon_runs SET state = $2 WHERE id = $1`, [view.id, state]);
+            await sql(`UPDATE dungeon_runs SET state = ? WHERE id = ?`, [JSON.stringify(state), view.id]);
         }
         return (await call<GeoDungeonRunResponse>("GET", paths.active, token)).body.dungeonRun;
     }
@@ -376,11 +368,11 @@ try {
     step("the host in the boss room is ready; half the party ready puts 90 s on the friend");
 
     // Ninety seconds on: put the friend's clock in the past instead of waiting.
-    await pool.query(
-        `UPDATE geo.dungeon_run_members SET state = jsonb_set(state, '{onClockSince}', to_jsonb($3::bigint))
-         WHERE dungeon_run_id = $1 AND player_id = $2`,
-        [door.id, friend.player.id, Date.now() - 91_000],
-    );
+    await sql(`UPDATE dungeon_run_members SET state = json_set(state, '$.onClockSince', ?) WHERE dungeon_run_id = ? AND player_id = ?`, [
+        Date.now() - 91_000,
+        door.id,
+        friend.player.id,
+    ]);
     const afterClock = (await call<GeoDungeonRunResponse>("GET", paths.active, token)).body.dungeonRun;
     assert.ok(afterClock.bossStarted && afterClock.fightRunId, "the boss starts for the one who was there");
     const friendOut = await friendSocket.next(runPush((v) => v.id === door.id && v.status === "failed"));
@@ -441,10 +433,12 @@ try {
     await moveIn(token, bossOf(door));
     const go = await moveIn(friend.accessToken, bossOf(door));
     assert.equal(go.status, 200, JSON.stringify(go.body));
-    const runs = await pool.query<{ player_id: string; battle_id: string | null; combatant_id: string }>(
-        `SELECT player_id, battle_id, combatant_id FROM geo.runs WHERE dungeon_run_id = $1 AND dungeon_room = $2`,
-        [door.id, bossOf(door)],
-    );
+    const runs = {
+        rows: await sql<{ player_id: string; battle_id: string | null; combatant_id: string }>(
+            `SELECT player_id, battle_id, combatant_id FROM runs WHERE dungeon_run_id = ? AND dungeon_room = ?`,
+            [door.id, bossOf(door)],
+        ),
+    };
     assert.equal(runs.rows.length, 2);
     assert.ok(runs.rows[0]!.battle_id && runs.rows[0]!.battle_id === runs.rows[1]!.battle_id, "one battle for both");
     type RunView = GeoRunResponse["run"];
@@ -483,10 +477,11 @@ try {
     if (hostRun.status === "active" && hostRun.currentActor) {
         const late = hostRun.currentActor;
         // The clock counts from the turn's start, so that's what goes back.
-        await pool.query(
-            `UPDATE geo.runs SET turn_started_at = now() - make_interval(secs => $2), turn_deadline = now() - interval '1 second' WHERE battle_id = $1`,
-            [runs.rows[0]!.battle_id, GEO_RUN_TURN_SECONDS + 1],
-        );
+        await sql(`UPDATE runs SET turn_started_at = ?, turn_deadline = ? WHERE battle_id = ?`, [
+            Date.now() - (GEO_RUN_TURN_SECONDS + 1) * 1000,
+            Date.now() - 1000,
+            runs.rows[0]!.battle_id,
+        ]);
         const nextUp = tokenOf(late) === token ? friend.accessToken : token;
         const nextUpSocket = nextUp === token ? hostSocket : friendSocket2;
         nextUpSocket.drain();
@@ -543,8 +538,8 @@ try {
             const tried = await playFirstCard(tokenOf(view.currentActor));
             if (tried.status !== 200 && !/isn't your turn/.test(tried.body.error)) assert.fail(JSON.stringify(tried.body));
         }
-        const { rows } = await pool.query<{ status: string; rewards: unknown }>(`SELECT status, rewards FROM geo.runs WHERE id = $1`, [hostRunId]);
-        return rows[0]!;
+        const [row] = await sql<{ status: string; rewards: string | null }>(`SELECT status, rewards FROM runs WHERE id = ?`, [hostRunId]);
+        return { status: row!.status, rewards: row!.rewards === null ? null : (JSON.parse(row!.rewards) as unknown) };
     }
 
     // A real drop: the friend's socket closes on their turn; after the reconnect window their turns skip.
@@ -576,14 +571,13 @@ try {
     step(`the shared fight played out: ${fought.status}; the host's dungeon is ${dungeonNow.status}`);
 
     // Everyone standing at the end gets their own: boss drops from their own roll, and their own chests.
-    const ends = await pool.query<{ player_id: string; status: string; rewards: { coins: number } | null }>(
-        `SELECT player_id, status, rewards FROM geo.runs WHERE battle_id = $1`,
-        [runs.rows[0]!.battle_id],
-    );
-    const members = await pool.query<{ player_id: string; status: string; chest: string | null }>(
-        `SELECT player_id, status, state->>'chestSelectionId' AS chest FROM geo.dungeon_run_members WHERE dungeon_run_id = $1`,
-        [door.id],
-    );
+    const ends = { rows: await sql<{ player_id: string; status: string; rewards: string | null }>(`SELECT player_id, status, rewards FROM runs WHERE battle_id = ?`, [runs.rows[0]!.battle_id]) };
+    const members = {
+        rows: await sql<{ player_id: string; status: string; chest: string | null }>(
+            `SELECT player_id, status, state ->> 'chestSelectionId' AS chest FROM dungeon_run_members WHERE dungeon_run_id = ?`,
+            [door.id],
+        ),
+    };
     const winners = members.rows.filter((m) => m.status === "won");
     for (const winner of winners) {
         assert.ok(winner.chest, "a winner's own chest selection");

@@ -1,8 +1,5 @@
 import assert from "node:assert/strict";
 import { GEO_API_PATHS, type GeoDeathResponse, type GeoMeResponse } from "@geo/shared";
-import { pool } from "../db";
-import { withTransaction } from "../db/transaction";
-import { addCoins } from "../modules/player/geo-player.repository";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -11,7 +8,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * keeps them through a death, and leaves the purse matching the ledger.
  * `npm run smoke:geo-bank`.
  */
-const { call, registerPlayer, stop } = await startSmokeServer();
+const { call, registerPlayer, sql, coins, stop } = await startSmokeServer();
 
 // Already on camp's 4-decimal grid, so camp is stored exactly here.
 const AT_CAMP = { latitude: 51.5007, longitude: -0.1246 };
@@ -26,7 +23,7 @@ try {
         call<{ error: string }>("POST", GEO_API_PATHS.me.bankWithdraw, accessToken, { amount, position });
 
     const startCoins = (await me()).coins;
-    await withTransaction((tx) => addCoins(tx, player.id, 100, "admin-grant", "bank-smoke"));
+    await coins(player.id, 100);
     assert.equal((await me()).bankCoins, 0);
     step("a new player's bank is empty");
 
@@ -69,11 +66,11 @@ try {
     assert.deepEqual([now.coins, now.bankCoins], [0, 50]);
     step("death takes the purse, not the bank");
 
-    const { rows } = await pool.query<{ coins: string; ledger: string; banked: string }>(
+    const rows = await sql<{ coins: number; ledger: number; banked: number }>(
         `SELECT p.coins,
-            COALESCE((SELECT SUM(delta) FROM geo.coin_ledger WHERE player_id = p.id), 0) AS ledger,
-            COALESCE((SELECT -SUM(delta) FROM geo.coin_ledger WHERE player_id = p.id AND reason LIKE 'bank-%'), 0) AS banked
-         FROM geo.players p WHERE p.id = $1`,
+            COALESCE((SELECT SUM(delta) FROM coin_ledger WHERE player_id = p.id), 0) AS ledger,
+            COALESCE((SELECT -SUM(delta) FROM coin_ledger WHERE player_id = p.id AND reason LIKE 'bank-%'), 0) AS banked
+         FROM players p WHERE p.id = ?`,
         [player.id],
     );
     const [balances] = rows;

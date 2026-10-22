@@ -5,10 +5,7 @@ import {
     type GeoMeResponse,
     type GeoRunResponse,
 } from "@geo/shared";
-import { pool } from "../db";
 import { GAME_CONFIG } from "../content";
-import { withTransaction } from "../db/transaction";
-import { addCoins } from "../modules/player/geo-player.repository";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -17,7 +14,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * in the main hand, buying slots, and auto-swap wearing the
  * tagged loadout as a fishing Run or a fight starts. `npm run smoke:geo-wardrobe`.
  */
-const { call, registerPlayer, stop } = await startSmokeServer();
+const { call, registerPlayer, sql, coins, stop } = await startSmokeServer();
 
 try {
     const { accessToken: token, player } = await registerPlayer("wardrobe");
@@ -92,7 +89,7 @@ try {
 
     const { slotCost } = GAME_CONFIG.wardrobe;
     assert.equal((await call("POST", GEO_API_PATHS.me.buyLoadoutSlot, token)).status, 400);
-    await withTransaction((tx) => addCoins(tx, player.id, slotCost.first, "admin-grant", "wardrobe-smoke"));
+    await coins(player.id, slotCost.first);
     const before = (await me()).player.coins;
     assert.equal((await call("POST", GEO_API_PATHS.me.buyLoadoutSlot, token)).status, 200);
     state = await me();
@@ -136,9 +133,9 @@ try {
     assert.equal(itemOf(state, state.equipment.mainHand), "bronze-dagger", "clearing a loadout leaves the gear on");
     step("save into the bought slot makes it active; clearing it leaves nothing active");
 
-    const { rows } = await pool.query<{ coins: string; ledger: string }>(
-        `SELECT p.coins, COALESCE((SELECT SUM(delta) FROM geo.coin_ledger WHERE player_id = p.id), 0) AS ledger
-         FROM geo.players p WHERE p.id = $1`,
+    const rows = await sql<{ coins: number; ledger: number }>(
+        `SELECT p.coins, COALESCE((SELECT SUM(delta) FROM coin_ledger WHERE player_id = p.id), 0) AS ledger
+         FROM players p WHERE p.id = ?`,
         [player.id],
     );
     const [balances] = rows;

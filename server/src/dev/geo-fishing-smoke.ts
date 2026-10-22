@@ -7,7 +7,6 @@ import {
     type GeoMeResponse,
     type GeoRunResponse,
 } from "@geo/shared";
-import { pool } from "../db";
 import { CONTENT } from "../content";
 import { startSmokeServer, step } from "./smoke-kit";
 
@@ -17,7 +16,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * landed fish in the inventory with its XP, the hand locked mid-Run, Soulbound
  * fish refused by the Market and vendors, and leaving. `npm run smoke:geo-fishing`.
  */
-const { call, registerPlayer, grant, stop } = await startSmokeServer();
+const { call, registerPlayer, grant, makeAdmin, stop } = await startSmokeServer();
 
 const me = async (token: string) => (await call<GeoMeResponse>("GET", GEO_API_PATHS.me.root, token)).body;
 const baitLeft = (body: GeoMeResponse) => body.bait.contents.reduce((sum, slot) => sum + slot.quantity, 0);
@@ -174,7 +173,7 @@ try {
     // The admin switch: every bite is a sea creature.
     const switchPath = GEO_API_PATHS.admin.seaCreatures;
     assert.equal((await call("PUT", switchPath, token, { always: true })).status, 403, "admins only");
-    await pool.query(`UPDATE geo.players SET role = 'admin' WHERE id = $1`, [player.player.id]);
+    await makeAdmin(player.player.id);
     assert.deepEqual((await call<GeoAdminSeaCreatures>("GET", switchPath, token)).body, { always: false });
     assert.deepEqual((await call<GeoAdminSeaCreatures>("PUT", switchPath, token, { always: true })).body, { always: true });
     await call("PUT", baitPath, token, { itemId: "worm-bait", quantity: 10 });

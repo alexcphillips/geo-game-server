@@ -55,7 +55,7 @@ const MIGRATIONS: string[][] = [
 
     // 2: the rest of the game, translated from server/src/db/geo.schema.ts
     // (read its comments for what each table means). Left out on purpose:
-    // presence (last_seen_at, activity), player_travel and spawns'
+    // presence (last_seen_at, activity: the socket hub's), player_travel and spawns'
     // out_of_reach_since live in World memory; the Market's refund-on-delete
     // trigger comes with the Market.
     //
@@ -559,6 +559,12 @@ const MIGRATIONS: string[][] = [
             WHERE status = 'held' AND listing_id IN (SELECT id FROM market_listings WHERE seller_id = OLD.id);
         END;`,
     ],
+
+    // 6: when a player in a party or a shared fight went offline. Their
+    // reconnect window and turn clock count from it, and the World forgets
+    // it in memory whenever it hibernates (any quiet moment with sockets
+    // open). One row per drop that matters, gone when they're back.
+    [`CREATE TABLE gone (player_id TEXT PRIMARY KEY, since INTEGER NOT NULL) STRICT, WITHOUT ROWID;`],
 ];
 
 export function migrate(db: Db) {

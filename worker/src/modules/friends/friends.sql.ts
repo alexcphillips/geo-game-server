@@ -40,7 +40,7 @@ export const DELETE_FRIEND = `
   RETURNING id, requester_id, addressee_id;
 `;
 
-/** Every friend (presence is World memory). */
+/** Every friend (presence is the socket hub's). */
 export const FIND_FRIENDS = `
   SELECT p.id, p.display_name AS name, f.accepted_at
   FROM friendships f

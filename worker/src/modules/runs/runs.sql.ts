@@ -6,6 +6,14 @@ export const FIND_ACTIVE_RUN = `SELECT ${RUN_COLUMNS} FROM runs WHERE player_id 
 
 export const FIND_RUN = `SELECT ${RUN_COLUMNS} FROM runs WHERE id = ? AND player_id = ?;`;
 
+/** The player's latest shared fight, going or ended since ?2 (ms): what a socket gets on (re)connect. Uses `runs_player_shared`. */
+export const FIND_RECENT_SHARED_RUN = `
+  SELECT ${RUN_COLUMNS} FROM runs
+  WHERE player_id = ? AND battle_id IS NOT NULL AND (status = 'active' OR ended_at > ?)
+  ORDER BY created_at DESC
+  LIMIT 1;
+`;
+
 /**
  * Ends the player's Run if it's gone untouched since ?3: the app was closed
  * mid-fight. Checked lazily, whenever the player next does something a Run

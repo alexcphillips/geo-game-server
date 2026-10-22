@@ -12,9 +12,6 @@ import {
     type GeoSession,
     type GeoWorldResponse,
 } from "@geo/shared";
-import { pool } from "../db";
-import { withTransaction } from "../db/transaction";
-import { grantItems } from "../modules/player/geo-player.repository";
 import { STARTER_KIT } from "../modules/accounts/geo-starter-kit";
 import { SPAWN_RULES } from "../world";
 import { startSmokeServer, step } from "./smoke-kit";
@@ -27,7 +24,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * Dev only — it creates throwaway accounts and deletes them after.
  * `npm run smoke:geo`.
  */
-const { call, registerPlayer, stop } = await startSmokeServer();
+const { call, registerPlayer, grant, sql, spawnClock, stop } = await startSmokeServer();
 
 try {
     // Accounts
@@ -55,9 +52,9 @@ try {
     assert.equal((await call("GET", GEO_API_PATHS.me.root)).status, 401);
     assert.equal((await call("GET", GEO_API_PATHS.me.root, "not-a-token")).status, 401);
 
-    // A malformed id is the caller's mistake (400), not a server error.
+    // A malformed id is the caller's mistake (no such Run), not a server error.
     const badRunId = await call("POST", GEO_API_PATHS.runs.flee.replace(":runId", "not-a-uuid"), accessToken);
-    assert.equal(badRunId.status, 400, JSON.stringify(badRunId.body));
+    assert.ok(badRunId.status === 400 || badRunId.status === 404, JSON.stringify(badRunId.body));
     step("me rejects missing and bad tokens");
 
     const me = await call<GeoMeResponse>("GET", GEO_API_PATHS.me.root, accessToken);
@@ -84,7 +81,7 @@ try {
     // Weapon requirements: Double Slash is daggers only, so a rod (fists) can't fight with it alone.
     const starterHand = me.body.hands.combat!;
     const doubleSlash = me.body.inventory.find((entry) => entry.itemId === "card.double-slash")!;
-    const [rodId] = await withTransaction((tx) => grantItems(tx, signUp.body.player.id, [{ itemId: "twig-rod", quantity: 1 }]));
+    const [rodId] = await grant(signUp.body.player.id, [{ itemId: "twig-rod", quantity: 1 }]);
     assert.equal((await call("PUT", slotPath("mainHand"), accessToken, { inventoryId: rodId })).status, 200);
     assert.equal((await call("PUT", handPath, accessToken, { inventoryIds: [doubleSlash.id] })).status, 200);
     const noWeapon = await call<{ error: string }>("POST", GEO_API_PATHS.runs.start, accessToken, { kind: "combat", enemyId: "spider" });
@@ -95,16 +92,14 @@ try {
     step(`a rod with only Double Slash in hand can't start a fight: "${noWeapon.body.error}"`);
 
     // Talisman Bag
-    const [charmId] = await withTransaction((tx) => grantItems(tx, signUp.body.player.id, [{ itemId: "storm-charm", quantity: 1 }]));
+    const [charmId] = await grant(signUp.body.player.id, [{ itemId: "storm-charm", quantity: 1 }]);
     const charm = { id: charmId! };
     const bagEntry = (id: string) => GEO_API_PATHS.me.talismanBagEntry.replace(":inventoryId", id);
     const bagged = await call<GeoMeResponse>("PUT", bagEntry(charm.id), accessToken);
     assert.deepEqual(bagged.body.talismanBag, { pages: 1, inventoryIds: [charm.id] });
     step("a storm-charm goes in the Talisman Bag; 1 page");
 
-    const [secondCharm] = await withTransaction((tx) =>
-        grantItems(tx, signUp.body.player.id, [{ itemId: "storm-charm", quantity: 1 }]),
-    );
+    const [secondCharm] = await grant(signUp.body.player.id, [{ itemId: "storm-charm", quantity: 1 }]);
     const duplicate = await call<{ error: string }>("PUT", bagEntry(secondCharm!), accessToken);
     assert.equal(duplicate.status, 400);
     step(`bag rejects a second copy: "${duplicate.body.error}"`);
@@ -124,29 +119,23 @@ try {
     // check a full bag refuses, then put things back for the fight below.
     const playerId = signUp.body.player.id;
     await call("DELETE", bagEntry(secondCharm!), accessToken);
-    await pool.query(
-        `WITH filler AS (
-           INSERT INTO geo.inventory (player_id, item_id)
-           SELECT $1, 'smoke-filler-' || n FROM generate_series(1, $2::int) n
-           RETURNING id, item_id
-         )
-         INSERT INTO geo.talisman_bag (player_id, item_id, inventory_id)
-         SELECT $1, item_id, id FROM filler;`,
-        [playerId, GEO_TALISMAN_BAG_PAGE_SIZE],
-    );
+    for (let n = 1; n <= GEO_TALISMAN_BAG_PAGE_SIZE; n++) {
+        await sql(`INSERT INTO inventory (player_id, id, item_id, obtained_at) VALUES (?, ?, ?, ?)`, [playerId, `smoke-filler-${n}`, `smoke-filler-${n}`, Date.now()]);
+        await sql(`INSERT INTO talisman_bag (player_id, item_id, inventory_id) VALUES (?, ?, ?)`, [playerId, `smoke-filler-${n}`, `smoke-filler-${n}`]);
+    }
     const full = await call<{ error: string }>("PUT", bagEntry(secondCharm!), accessToken);
     assert.equal(full.status, 400);
     assert.equal(full.body.error, GEO_TALISMAN_BAG_FULL);
     step(`a full bag refuses another: "${full.body.error}"`);
 
-    await pool.query(`DELETE FROM geo.inventory WHERE player_id = $1 AND item_id LIKE 'smoke-filler-%'`, [playerId]);
+    await sql(`DELETE FROM inventory WHERE player_id = ? AND item_id LIKE 'smoke-filler-%'`, [playerId]);
     assert.equal((await call("PUT", bagEntry(secondCharm!), accessToken)).status, 200);
 
     // Lunchbox
     const lunchboxPath = (slot: number) => GEO_API_PATHS.me.lunchboxSlot.replace(":slot", String(slot));
     const amountOf = (body: GeoMeResponse, itemId: string) =>
         body.inventory.filter((entry) => entry.itemId === itemId).reduce((sum, entry) => sum + entry.quantity, 0);
-    await withTransaction((tx) => grantItems(tx, playerId, [{ itemId: "grilled-trout", quantity: 4 }]));
+    await grant(playerId, [{ itemId: "grilled-trout", quantity: 4 }]);
 
     // Camp: packing (restocking) only happens there.
     const CAMP = { latitude: 51.50713, longitude: -0.12794 };
@@ -183,7 +172,7 @@ try {
     assert.equal(amountOf(packed.body, "bread"), 5);
     step("packing 3 trout leaves 1 in the inventory, and the bread it replaced comes back");
 
-    await pool.query(`UPDATE geo.players SET lunchbox_slots = 2 WHERE id = $1`, [playerId]);
+    await sql(`UPDATE players SET lunchbox_slots = 2 WHERE id = ?`, [playerId]);
     const twice = await call<{ error: string }>("PUT", lunchboxPath(1), accessToken, { itemId: "grilled-trout", quantity: 1, position: CAMP });
     assert.equal(twice.status, 400);
     step(`with a second slot, the same food can't go in both: "${twice.body.error}"`);
@@ -242,19 +231,14 @@ try {
 
     // Food gone from the stored lunchbox (as if tampered with) can't be eaten
     // from the fight's copy: refused, and the Run's health and food unchanged.
-    const ghostSlot = (await pool.query(`DELETE FROM geo.lunchbox WHERE player_id = $1 AND slot = 1 RETURNING *`, [playerId])).rows[0];
+    const [ghostSlot] = await sql<{ slot: number; item_id: string; quantity: number }>(`DELETE FROM lunchbox WHERE player_id = ? AND slot = 1 RETURNING *`, [playerId]);
     const beforeGhost = (await call<GeoRunResponse>("GET", GEO_API_PATHS.runs.active, accessToken)).body.run;
     const ghostMeal = await call<{ error: string }>("POST", GEO_API_PATHS.runs.turns.replace(":runId", runId), accessToken, { lunchboxSlot: 1 });
     assert.equal(ghostMeal.status, 400);
     const afterGhost = (await call<GeoRunResponse>("GET", GEO_API_PATHS.runs.active, accessToken)).body.run;
     assert.deepEqual(afterGhost.combatants, beforeGhost.combatants, "no heal, no turn");
     assert.deepEqual(afterGhost.lunchbox, beforeGhost.lunchbox, "the fight's lunchbox is untouched");
-    await pool.query(`INSERT INTO geo.lunchbox (player_id, slot, item_id, quantity) VALUES ($1, $2, $3, $4)`, [
-        playerId,
-        ghostSlot.slot,
-        ghostSlot.item_id,
-        ghostSlot.quantity,
-    ]);
+    await sql(`INSERT INTO lunchbox (player_id, slot, item_id, quantity) VALUES (?, ?, ?, ?)`, [playerId, ghostSlot!.slot, ghostSlot!.item_id, ghostSlot!.quantity]);
     step(`food gone from the lunchbox can't be eaten from the fight's copy: "${ghostMeal.body.error}"`);
 
     const badSlot = await call("POST", GEO_API_PATHS.runs.turns.replace(":runId", runId), accessToken, { lunchboxSlot: 3 });
@@ -264,15 +248,19 @@ try {
     // A card that has left the inventory (as if sold) can't be played on from
     // the fight's copy of the hand: the turn is refused and nothing is saved.
     const goneCard = started.body.run.hand[0]!;
-    const [goneRow] = (await pool.query(`DELETE FROM geo.inventory WHERE id = $1 RETURNING *`, [goneCard.inventoryId])).rows;
+    const [goneRow] = await sql<Record<string, unknown>>(`DELETE FROM inventory WHERE player_id = ? AND id = ? RETURNING *`, [playerId, goneCard.inventoryId]);
     const ghostTurn = await call<{ error: string }>("POST", GEO_API_PATHS.runs.turns.replace(":runId", runId), accessToken, { inventoryId: goneCard.inventoryId });
     assert.equal(ghostTurn.status, 400);
     const unchanged = (await call<GeoRunResponse>("GET", GEO_API_PATHS.runs.active, accessToken)).body.run;
     assert.deepEqual(unchanged.hand, started.body.run.hand, "the refused turn saved nothing");
-    await pool.query(
-        `INSERT INTO geo.inventory (id, player_id, item_id, quantity, charges_left, obtained_at) VALUES ($1, $2, $3, $4, $5, $6)`,
-        [goneRow.id, goneRow.player_id, goneRow.item_id, goneRow.quantity, goneRow.charges_left, goneRow.obtained_at],
-    );
+    await sql(`INSERT INTO inventory (id, player_id, item_id, quantity, charges_left, obtained_at) VALUES (?, ?, ?, ?, ?, ?)`, [
+        goneRow!.id,
+        goneRow!.player_id,
+        goneRow!.item_id,
+        goneRow!.quantity,
+        goneRow!.charges_left,
+        goneRow!.obtained_at,
+    ]);
     step(`a card gone from the inventory can't be played from the fight: "${ghostTurn.body.error}"`);
 
     let run = ate.body.run;
@@ -306,7 +294,7 @@ try {
         const carried = (await call<GeoMeResponse>("GET", GEO_API_PATHS.me.root, accessToken)).body.health;
         assert.equal(carried.current, Math.min(you.health, carried.max));
         // The enemy may strike before the first decision, so: no more than that.
-        await pool.query(`UPDATE geo.players SET health = 37 WHERE id = $1`, [playerId]);
+        await sql(`UPDATE players SET health = 37 WHERE id = ?`, [playerId]);
         const next = await call<GeoRunResponse>("POST", GEO_API_PATHS.runs.start, accessToken, { kind: "combat", enemyId: "spider" });
         assert.equal(next.status, 201, JSON.stringify(next.body));
         const startedAt = next.body.run.combatants.find((c) => c.side === "player")!.health;
@@ -319,16 +307,16 @@ try {
     // Defeat costs every coin. Rig a fight to lose: 1 health against a
     // spider that can't die, with coins in the purse first.
     {
-        await pool.query(`UPDATE geo.players SET coins = coins + 50 WHERE id = $1`, [signUp.body.player.id]);
+        await sql(`UPDATE players SET coins = coins + 50 WHERE id = ?`, [signUp.body.player.id]);
         const before = (await call<GeoMeResponse>("GET", GEO_API_PATHS.me.root, accessToken)).body.player.coins;
         const doomed = await call<GeoRunResponse>("POST", GEO_API_PATHS.runs.start, accessToken, { kind: "combat", enemyId: "spider" });
         assert.equal(doomed.status, 201, JSON.stringify(doomed.body));
-        await pool.query(
-            `UPDATE geo.runs SET state = jsonb_set(state, '{combatants}', (
-               SELECT jsonb_agg(CASE WHEN c->>'side' = 'player' THEN jsonb_set(c, '{health}', '1')
-                                     ELSE jsonb_set(c, '{health}', '9999') END)
-               FROM jsonb_array_elements(state->'combatants') c))
-             WHERE id = $1`,
+        await sql(
+            `UPDATE runs SET state = json_set(state, '$.combatants', (
+               SELECT json_group_array(json(CASE WHEN c.value ->> 'side' = 'player' THEN json_set(c.value, '$.health', 1)
+                                                 ELSE json_set(c.value, '$.health', 9999) END))
+               FROM json_each(state, '$.combatants') c))
+             WHERE id = ?`,
             [doomed.body.run.id],
         );
         let lost = doomed.body.run;
@@ -339,8 +327,8 @@ try {
         assert.equal(lost.status, "defeat");
         assert.equal(lost.coinsLost, before);
         assert.equal((await call<GeoMeResponse>("GET", GEO_API_PATHS.me.root, accessToken)).body.player.coins, 0);
-        const { rows: ledger } = await pool.query<{ delta: string; reason: string }>(
-            `SELECT delta, reason FROM geo.coin_ledger WHERE player_id = $1 ORDER BY id`,
+        const ledger = await sql<{ delta: number; reason: string }>(
+            `SELECT delta, reason FROM coin_ledger WHERE player_id = ? ORDER BY id`,
             [signUp.body.player.id],
         );
         assert.ok(ledger.some((row) => row.reason === "run-defeat" && Number(row.delta) === -before));
@@ -365,7 +353,7 @@ try {
 
     // The admin kill: all coins go, and a Run in progress ends as a defeat.
     {
-        await pool.query(`UPDATE geo.players SET coins = coins + 30 WHERE id = $1`, [signUp.body.player.id]);
+        await sql(`UPDATE players SET coins = coins + 30 WHERE id = ?`, [signUp.body.player.id]);
         const fight = await call<GeoRunResponse>("POST", GEO_API_PATHS.runs.start, accessToken, { kind: "combat", enemyId: "spider" });
         assert.equal(fight.status, 201, JSON.stringify(fight.body));
         const killed = await call<GeoDeathResponse>("POST", GEO_API_PATHS.dev.kill, accessToken);
@@ -373,11 +361,11 @@ try {
         assert.deepEqual(killed.body, { cause: "admin-kill", coinsLost: 30 });
         assert.equal((await call<GeoMeResponse>("GET", GEO_API_PATHS.me.root, accessToken)).body.player.coins, 0);
         assert.equal((await call("GET", GEO_API_PATHS.runs.active, accessToken)).body, null);
-        const { rows: ledger } = await pool.query<{ delta: string; reason: string }>(
-            `SELECT delta, reason FROM geo.coin_ledger WHERE player_id = $1 ORDER BY id DESC LIMIT 1`,
+        const ledger = await sql<{ delta: number; reason: string }>(
+            `SELECT delta, reason FROM coin_ledger WHERE player_id = ? ORDER BY id DESC LIMIT 1`,
             [signUp.body.player.id],
         );
-        assert.deepEqual(ledger[0], { delta: "-30", reason: "admin-kill" });
+        assert.deepEqual(ledger[0], { delta: -30, reason: "admin-kill" });
         step("admin kill took all 30 coins and ended the fight as a defeat");
     }
 
@@ -393,7 +381,7 @@ try {
 
     // Bait: packed like the lunchbox, but only bait goes in.
     const baitPath = (slot: number) => GEO_API_PATHS.me.baitSlot.replace(":slot", String(slot));
-    await withTransaction((tx) => grantItems(tx, playerId, [{ itemId: "worm-bait", quantity: 30 }]));
+    await grant(playerId, [{ itemId: "worm-bait", quantity: 30 }]);
     for (const [why, slot, body] of [
         ["food", 0, { itemId: "bread", quantity: 1, position: CAMP }],
         ["a locked slot", 1, { itemId: "worm-bait", quantity: 1, position: CAMP }],
@@ -480,10 +468,7 @@ try {
     step(`walked 1 km: ${left.length} old spawn(s) linger, each despawning within ${SPAWN_RULES.outOfReachSeconds}s`);
 
     // Run the clock forward rather than wait.
-    await pool.query(
-        `UPDATE geo.spawns SET out_of_reach_since = now() - interval '46 seconds' WHERE player_id = $1 AND out_of_reach_since IS NOT NULL`,
-        [playerId],
-    );
+    await spawnClock(playerId, SPAWN_RULES.outOfReachSeconds + 1);
     const moved = (await worldAt(elsewhere)).body.spawns;
     assert.ok(!moved.some((spawn) => spawns.some((old) => old.id === spawn.id)), "gone after the countdown");
     for (const spawn of moved) assert.ok(distanceMetres(elsewhere, spawn) <= SPAWN_RULES.maxSpawnMetres + 1);

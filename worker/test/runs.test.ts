@@ -2,6 +2,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import {
     GEO_API_PATHS,
+    GEO_DUNGEON_RECONNECT_SECONDS,
     GEO_RUN_TURN_SECONDS,
     type GeoChestsResponse,
     type GeoDeathResponse,
@@ -143,11 +144,16 @@ describe("shared fights and the clock", () => {
         const battleId = await inWorld((db) => db.one<{ battle_id: string }>(`SELECT battle_id FROM runs WHERE id = ?;`, run.id)!.battle_id);
         const deadline = await inWorld((db) => dueAt(db, battleKey(battleId)));
         expect(deadline).toBe(Date.parse(run.turnDeadline!));
-        expect(deadline! - Date.now()).toBeGreaterThan((GEO_RUN_TURN_SECONDS - 5) * 1000);
+        // Neither has a socket: the turn is up to their reconnect window from when they were last heard.
+        expect(deadline! - Date.now()).toBeGreaterThan((GEO_DUNGEON_RECONNECT_SECONDS - 5) * 1000);
+        expect(deadline! - Date.now()).toBeLessThanOrEqual(GEO_RUN_TURN_SECONDS * 1000);
 
-        const before = await call<GeoRunResponse>("GET", runs.active, a.token);
+        // Read as whoever isn't up: a request moves its player's window on.
+        const actor = run.currentActor;
+        const watcher = await inWorld((db) => (db.one<{ combatant_id: string }>(`SELECT combatant_id FROM runs WHERE id = ?;`, run.id)!.combatant_id === actor ? b : a));
+        const before = await call<GeoRunResponse>("GET", runs.active, watcher.token);
         await inWorld((_db, instance) => runDueJobs(instance.state, deadline! + 1));
-        const after = await call<GeoRunResponse>("GET", runs.active, a.token);
+        const after = await call<GeoRunResponse>("GET", runs.active, watcher.token);
         expect(after.body.run.version).toBeGreaterThan(before.body.run.version);
         expect(after.body.run.currentActor).not.toBe(before.body.run.currentActor);
         // The next turn's clock is booked.

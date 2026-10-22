@@ -43,18 +43,16 @@ export async function rowsWrittenBy(work: () => Promise<unknown>): Promise<numbe
 }
 
 let next = 0;
-/** A new player, signed in: their session and an `me()` that reads `/geo/me`. */
+/** A new player, signed in: their session, an `me()` that reads `/geo/me`, and how to sign in again. */
 export async function newPlayer(name = "player") {
     next += 1;
-    const signUp = await call<GeoSession>("POST", GEO_API_PATHS.auth.register, undefined, {
-        username: `${name}${next}`,
-        email: `${name}${next}@example.test`,
-        password: "long-enough-pw",
-    });
+    const email = `${name}${next}@example.test`;
+    const password = "long-enough-pw";
+    const signUp = await call<GeoSession>("POST", GEO_API_PATHS.auth.register, undefined, { username: `${name}${next}`, email, password });
     if (signUp.status !== 201) throw new Error(`Sign-up failed: ${JSON.stringify(signUp.body)}`);
     const { accessToken: token, player } = signUp.body;
     const me = async () => (await call<GeoMeResponse>("GET", GEO_API_PATHS.me.root, token)).body;
-    return { token, id: player.id, me };
+    return { token, id: player.id, me, email, password };
 }
 
 /** The total of an item across a player's inventory rows. */

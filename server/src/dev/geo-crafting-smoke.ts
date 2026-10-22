@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { GEO_API_PATHS, type GeoContentResponse, type GeoMeResponse } from "@geo/shared";
-import { pool } from "../db";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -9,7 +8,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * (too few inputs, too low a level) takes nothing.
  * `npm run smoke:geo-crafting`. Dev only.
  */
-const { call, registerPlayer, grant, stop } = await startSmokeServer();
+const { call, registerPlayer, grant, sql, stop } = await startSmokeServer();
 
 const craftPath = (recipeId: string) => GEO_API_PATHS.crafting.craft.replace(":recipeId", recipeId);
 const quantityOf = (me: GeoMeResponse, itemId: string) =>
@@ -55,8 +54,8 @@ try {
     step(`a recipe above the player's level is refused: "${unskilled.body.error}"`);
 
     // Combat 5 is 1,000 XP (100 + 200 + 300 + 400).
-    await pool.query(
-        `INSERT INTO geo.skill_xp (player_id, skill, xp) VALUES ($1, 'combat', 1000)
+    await sql(
+        `INSERT INTO skill_xp (player_id, skill, xp) VALUES (?, 'combat', 1000)
          ON CONFLICT (player_id, skill) DO UPDATE SET xp = 1000`,
         [session.player.id],
     );

@@ -1,10 +1,6 @@
 import assert from "node:assert/strict";
 import { GEO_API_PATHS, type GeoMeResponse } from "@geo/shared";
-import { pool } from "../db";
 import { GAME_CONFIG } from "../content";
-import { withTransaction } from "../db/transaction";
-import { addCoins, addSkillXp } from "../modules/player/geo-player.repository";
-import { ownModifiers } from "../world/global-effects";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -12,7 +8,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * skills, held items, refusals while active, Kat raising the rarity, and a
  * pet keeping its XP through the Market. `npm run smoke:geo-pets`.
  */
-const { call, registerPlayer, grant, stop } = await startSmokeServer();
+const { call, registerPlayer, grant, sql, coins, xp, modifiers, stop } = await startSmokeServer();
 
 const PET = "pet.tarantula.common";
 const KAT = "kat";
@@ -32,7 +28,7 @@ try {
         { itemId: "silk-collar", quantity: 2 },
         { itemId: "silk-spool", quantity: 20 },
     ]);
-    await withTransaction((tx) => addCoins(tx, playerId, 50_000, "admin-grant", "pets-smoke"));
+    await coins(playerId, 50_000);
 
     let body = await me(token);
     const petId = body.inventory.find((entry) => entry.itemId === PET)!.id;
@@ -48,13 +44,13 @@ try {
     assert.equal(response.status, 400, "only pets can be active");
     step("summoning a pet; nothing else can be");
 
-    await withTransaction((tx) => addSkillXp(tx, playerId, "combat", 300));
-    await withTransaction((tx) => addSkillXp(tx, playerId, "foraging", 300));
+    await xp(playerId, "combat", 300);
+    await xp(playerId, "foraging", 300);
     body = await me(token);
     const share = GAME_CONFIG.pets.otherSkillShare * (GAME_CONFIG.pets.skillMultiplier.foraging ?? 1);
     assert.equal(petEntry(body, petId)?.pet?.xp, Math.floor(300 + 300 * share));
     assert.ok((petEntry(body, petId)?.pet?.level ?? 0) > 1);
-    const defense = (await ownModifiers(playerId)).filter((m) => m.stat === "defense").reduce((sum, m) => sum + m.value, 0);
+    const defense = (await modifiers(playerId)).filter((m) => m.stat === "defense").reduce((sum, m) => sum + m.value, 0);
     assert.ok(defense > 0, "the active pet adds its defense");
     step("the active pet levels from its own skill and a share of others, and gives stats");
 
@@ -63,7 +59,7 @@ try {
     assert.equal(petEntry(response.body, petId)?.pet?.heldItem, "silk-collar");
     assert.equal(count(response.body, "silk-collar"), 1);
     const xpBefore = petEntry(response.body, petId)!.pet!.xp;
-    await withTransaction((tx) => addSkillXp(tx, playerId, "combat", 100));
+    await xp(playerId, "combat", 100);
     body = await me(token);
     assert.equal(petEntry(body, petId)!.pet!.xp, Math.floor(xpBefore + 120));
     step("a held item is used up and boosts its skill's pet XP");
@@ -96,7 +92,7 @@ try {
     assert.equal(response.status, 400, "not ready yet");
     step("Kat takes the pet and her price, and holds it until it's ready");
 
-    await pool.query(`UPDATE geo.pet_upgrades SET ready_at = now() - interval '1 minute' WHERE player_id = $1`, [playerId]);
+    await sql(`UPDATE pet_upgrades SET ready_at = ? WHERE player_id = ?`, [Date.now() - 60_000, playerId]);
     response = await call<GeoMeResponse>("POST", katPath(GEO_API_PATHS.vendors.collectPetUpgrade), token);
     assert.equal(response.status, 200, JSON.stringify(response.body));
     const back = petEntry(response.body, petId);
@@ -107,7 +103,7 @@ try {
 
     const buyer = await registerPlayer("pets-buyer");
     const buyerId = (await me(buyer.accessToken)).player.id;
-    await withTransaction((tx) => addCoins(tx, buyerId, 1_000_000, "admin-grant", "pets-smoke"));
+    await coins(buyerId, 1_000_000);
     const listed = await call("POST", GEO_API_PATHS.market.listings, token, {
         inventoryId: petId,
         type: "bin",
@@ -115,7 +111,7 @@ try {
         price: 100_000,
     });
     assert.equal(listed.status, 201, JSON.stringify(listed.body));
-    const { rows } = await pool.query<{ id: string }>(`SELECT id FROM geo.market_listings WHERE source_inventory_id = $1`, [petId]);
+    const rows = await sql<{ id: string }>(`SELECT id FROM market_listings WHERE source_inventory_id = ?`, [petId]);
     const listingId = rows[0]!.id;
     const bought = await call<GeoMeResponse>("POST", GEO_API_PATHS.market.buy.replace(":listingId", listingId), buyer.accessToken, {
         expectedPrice: 100_000,

@@ -100,10 +100,10 @@ try {
     benSocket.ws.close();
     await anaSocket.next(friendsHint, OFFLINE_GRACE_MS + 5000);
     const gone = await statusOf(a, (status) => !status.online);
-    assert.ok(!gone.online && gone.lastSeenAt, JSON.stringify(gone));
+    assert.ok(!gone.online, JSON.stringify(gone));
     assert.equal((await report(b, "trading")).status, 204);
     assert.equal((await statusOf(a, (status) => status.online)).online, false, "a report without a socket is ignored");
-    step(`closing the app's socket goes offline after the ${OFFLINE_GRACE_MS / 1000} s grace, with a last-seen time; friends hear`);
+    step(`closing the app's socket goes offline after the ${OFFLINE_GRACE_MS / 1000} s grace; friends hear`);
 
     // Cat asks Ana, then Ana asks Cat back: that accepts Cat's.
     await ask(c, ana.player.displayName);

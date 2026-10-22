@@ -20,11 +20,11 @@ export async function signAccessToken(secret: string, playerId: string): Promise
         .sign(keyOf(secret));
 }
 
-/** Throws if absent, expired, forged, or meant for another audience. */
-export async function verifyAccessToken(secret: string, token: string): Promise<GeoTokenPayload> {
+/** Throws if absent, expired, forged, or meant for another audience. `expiresAt`: when it runs out (ms). */
+export async function verifyAccessToken(secret: string, token: string): Promise<GeoTokenPayload & { expiresAt: number }> {
     const { payload } = await jwtVerify(token, keyOf(secret), { audience: AUDIENCE, algorithms: ["HS256"] });
-    if (typeof payload.playerId !== "string") throw new Error("Malformed geo token");
-    return { playerId: payload.playerId };
+    if (typeof payload.playerId !== "string" || typeof payload.exp !== "number") throw new Error("Malformed geo token");
+    return { playerId: payload.playerId, expiresAt: payload.exp * 1000 };
 }
 
 /** A new opaque refresh token, and the hash that gets stored. */

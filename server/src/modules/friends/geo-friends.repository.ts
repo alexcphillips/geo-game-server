@@ -39,7 +39,7 @@ function toFriend(row: FriendRow): GeoFriend {
         name: row.name,
         status: row.activity
             ? { online: true, activity: row.activity, skill: row.activity_skill }
-            : { online: false, lastSeenAt: row.last_seen_at?.toISOString() ?? null },
+            : { online: false },
         since: row.accepted_at.toISOString(),
     };
 }

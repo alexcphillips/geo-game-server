@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import {
     GEO_FEEDBACK_STATUSES,
+    GEO_SOCKET_CLOSE,
     GEO_MAIL_BODY_MAX,
     GEO_MAIL_TITLE_MAX,
     GEO_POSTABLE_ANNOUNCEMENT_KINDS,
@@ -113,6 +114,8 @@ export async function setBanned(c: Ctx) {
         if (!adminRepository.setBanned(db, playerId, banned)) throw AppError.notFound("Player not found");
         // The auth check reads the ban on every request; ending sessions stops refreshes too.
         if (banned) db.run(REVOKE_ALL_FOR_PLAYER, Date.now(), playerId);
+        // Their sockets close too, so pushes and presence stop at once.
+        if (banned) db.afterCommit(() => c.var.world.hub.disconnect(playerId, GEO_SOCKET_CLOSE.banned, "Suspended"));
         adminRepository.audit(db, adminId, banned ? "ban" : "unban", playerId);
         return playerAfter(db, playerId);
     });

@@ -7,7 +7,6 @@ import {
     type GeoAdminSuggestionsResponse,
     type GeoPlacesResponse,
 } from "@geo/shared";
-import { pool } from "../db";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -16,13 +15,13 @@ import { startSmokeServer, step } from "./smoke-kit";
  * made from a suggestion accepts and links it; every change is audited.
  */
 async function main() {
-    const { call, registerPlayer, stop } = await startSmokeServer();
+    const { call, registerPlayer, sql, makeAdmin, stop } = await startSmokeServer();
     const placeIds: string[] = [];
     let suggestionId: string | null = null;
     try {
         const player = await registerPlayer("places");
         const admin = await registerPlayer("admin");
-        await pool.query(`UPDATE geo.players SET role = 'admin' WHERE id = $1`, [admin.player.id]);
+        await makeAdmin(admin.player.id);
 
         // Somewhere no other test or real place will be: the middle of the South Atlantic.
         const here = { latitude: -40.123, longitude: -20.456 };
@@ -148,18 +147,18 @@ async function main() {
         placeIds.shift();
         step("an admin removes it for good");
 
-        const audit = await pool.query<{ action: string }>(
-            `SELECT action FROM geo.admin_actions WHERE target = $1 ORDER BY id`,
+        const audit = await sql<{ action: string }>(
+            `SELECT action FROM admin_actions WHERE target = ? ORDER BY id`,
             [created.body.id],
         );
         assert.deepEqual(
-            audit.rows.map((row) => row.action),
+            audit.map((row) => row.action),
             ["create-place", "update-place", "update-place", "update-place", "update-place", "delete-place"],
         );
         step("every change is audited");
     } finally {
-        await pool.query(`DELETE FROM geo.places WHERE id = ANY($1::uuid[])`, [placeIds]);
-        if (suggestionId) await pool.query(`DELETE FROM geo.location_suggestions WHERE id = $1`, [suggestionId]);
+        await sql(`DELETE FROM places WHERE id IN (SELECT value FROM json_each(?))`, [JSON.stringify(placeIds)]);
+        if (suggestionId) await sql(`DELETE FROM location_suggestions WHERE id = ?`, [suggestionId]);
         await stop();
     }
 }

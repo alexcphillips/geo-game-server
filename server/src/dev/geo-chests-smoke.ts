@@ -8,8 +8,6 @@ import {
     type GeoRunResponse,
 } from "@geo/shared";
 import { CONTENT } from "../content";
-import { withTransaction } from "../db/transaction";
-import { addCoins } from "../modules/player/geo-player.repository";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -17,7 +15,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * chest selection instead of loot, the selection waiting as pending (through
  * a death too), refusals, opening one, and the history. `npm run smoke:geo-chests`.
  */
-const { call, registerPlayer, stop } = await startSmokeServer();
+const { call, registerPlayer, coins, stop } = await startSmokeServer();
 
 const openPath = (selectionId: string) => GEO_API_PATHS.chests.open.replace(":selectionId", selectionId);
 const me = async (token: string) => (await call<GeoMeResponse>("GET", GEO_API_PATHS.me.root, token)).body;
@@ -89,7 +87,7 @@ try {
     assert.equal(refused.status, 400);
     step("refuses a chest you can't pay for, or that isn't there");
 
-    await withTransaction((tx) => addCoins(tx, session.player.id, 600, "admin-grant", "chests smoke"));
+    await coins(session.player.id, 600);
     const before = await me(token);
     const opened = await call<GeoOpenChestResponse>("POST", openPath(reward.selectionId), token, { index: gold });
     assert.equal(opened.status, 200, JSON.stringify(opened.body));

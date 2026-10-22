@@ -29,22 +29,20 @@ import type { ChangedPairRecord, FriendRecord, PairRecord, RequestRecord } from 
 
 /**
  * Friends and requests, from server/src/modules/friends/geo-friends.repository.ts.
- * Presence is World memory, not rows: online while the hub has a socket for
- * them (session 5), doing what their app last reported; last seen is when
- * they were last heard from.
+ * Presence is the socket hub's, not rows: online while they have a socket
+ * open (or within its grace), doing what their app last reported.
  */
 
 const iso = (ms: number) => new Date(ms).toISOString();
 
 function toFriend(world: World, row: FriendRecord): GeoFriend {
-    const doing = world.hub.isConnected(row.id) ? world.presence.get(row.id) : undefined;
-    const lastSeen = world.lastHeard.get(row.id);
+    const doing = world.hub.activityOf(row.id);
     return {
         playerId: row.id,
         name: row.name,
         status: doing
             ? { online: true, activity: doing.activity, skill: doing.skill }
-            : { online: false, lastSeenAt: lastSeen === undefined ? null : iso(lastSeen) },
+            : { online: false },
         since: iso(row.accepted_at),
     };
 }
@@ -137,14 +135,12 @@ export function tellFriends(world: World, playerId: string) {
     }
 }
 
-/** What the player is doing now, from their app: World memory, no write. Ignored without a socket: they're offline. */
+/** What the player is doing now, from their app: kept on their sockets, no write. Ignored without a socket: they're offline. */
 export function reportActivity(world: World, playerId: string, activity: GeoActivity, skill: string | null) {
-    if (!world.hub.isConnected(playerId)) return;
-    world.presence.set(playerId, { activity, skill });
-    tellFriends(world, playerId);
+    if (world.hub.setActivity(playerId, { activity, skill })) tellFriends(world, playerId);
 }
 
-/** The HUD's badge counts, for the socket's pushes (session 5). */
+/** The HUD's badge counts, for the socket's pushes. */
 export function countBadges(db: Db, playerId: string): GeoBadges {
     return {
         incomingRequests: db.one<{ count: number }>(COUNT_INCOMING, playerId)?.count ?? 0,

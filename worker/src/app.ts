@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { AppError } from "../../server/src/http/AppError";
-import type { GeoActivity, GeoRole } from "@geo/shared";
+import type { GeoRole } from "@geo/shared";
 import type { Db } from "./db/db";
 import type { Env } from "./env";
 import { accountsRoutes } from "./modules/accounts/accounts.routes";
@@ -28,7 +28,8 @@ import { vendorsRoutes } from "./modules/vendors/vendors.routes";
 import { wardrobeRoutes } from "./modules/wardrobe/wardrobe.routes";
 import type { TravelMemory } from "./modules/world/world.types";
 import { worldRoutes } from "./modules/world/world.routes";
-import type { Hub } from "./realtime/hub";
+import type { SocketHub } from "./realtime/hub";
+import { socketRoutes } from "./realtime/socket.routes";
 
 /**
  * What every route can reach: the World's database, the Worker's settings,
@@ -40,12 +41,10 @@ export type World = {
     env: Env;
     /** When each player was last heard from (any signed-in request): presence. */
     lastHeard: Map<string, number>;
-    /** What each connected player is doing, as their app reports it; friends see it. Cleared when they go. */
-    presence: Map<string, { activity: GeoActivity; skill: string | null }>;
     /** Each player's last point and walked distance, for spawns (world/travel.ts). */
     travel: Map<string, TravelMemory>;
-    /** Who's connected, and pushes to them (a stand-in until session 5's sockets). */
-    hub: Hub;
+    /** Who's connected (and what they're doing), and pushes to them: realtime/hub.ts. */
+    hub: SocketHub;
 };
 export type AppEnv = { Variables: { world: World; playerId?: string; role?: GeoRole } };
 
@@ -84,6 +83,7 @@ export function createApp(world: World) {
     app.route("/", feedbackRoutes);
     app.route("/", adminRoutes);
     app.route("/", opsRoutes);
+    app.route("/", socketRoutes);
 
     app.notFound((c) => c.json({ error: `No route for ${c.req.method} ${new URL(c.req.url).pathname}` }, 404));
 

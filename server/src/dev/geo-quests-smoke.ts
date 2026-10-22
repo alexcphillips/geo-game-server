@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
 import { GEO_API_PATHS, geoXpToNextLevel, type GeoQuestsResponse } from "@geo/shared";
-import { withTransaction } from "../db/transaction";
-import { addCoins, addSkillXp } from "../modules/player/geo-player.repository";
-import { recordQuestEvents } from "../modules/quests/geo-quests.repository";
+import type { recordQuestEvents } from "../modules/quests/geo-quests.repository";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -11,7 +9,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * tier 2 opens only with both its combat level and Trial I turned in. Fights
  * are stood in for by recording their wins directly. `npm run smoke:geo-quests`.
  */
-const { call, registerPlayer, grant, stop } = await startSmokeServer();
+const { call, registerPlayer, grant, coins, xp: addXp, questEvents, stop } = await startSmokeServer();
 
 const CAMP = { latitude: 51.5007, longitude: -0.1246 };
 
@@ -29,7 +27,7 @@ try {
         assert.deepEqual(held.map((q) => q.id), [id]);
         return held[0]!;
     };
-    const win = (events: Parameters<typeof recordQuestEvents>[2]) => withTransaction((tx) => recordQuestEvents(tx, player.id, events));
+    const win = (events: Parameters<typeof recordQuestEvents>[2]) => questEvents(player.id, events);
 
     let first = await only("slime-cull");
     assert.equal(first.tracked, true);
@@ -49,7 +47,7 @@ try {
     assert.equal((await claim("trial-1")).status, 404);
 
     // Camp placed and coins banked before Rainy Day Fund is given still count.
-    await withTransaction((tx) => addCoins(tx, player.id, 50, "admin-grant", "quests-smoke"));
+    await coins(player.id, 50);
     assert.equal((await call("PUT", GEO_API_PATHS.me.camp, accessToken, { position: CAMP })).status, 200);
     const deposit = (amount: number) => call("POST", GEO_API_PATHS.me.bankDeposit, accessToken, { amount, position: CAMP });
     assert.equal((await deposit(4)).status, 200);
@@ -102,7 +100,7 @@ try {
 
     let xp = 0;
     for (let level = 1; level < 5; level++) xp += geoXpToNextLevel(level);
-    await withTransaction((tx) => addSkillXp(tx, player.id, "combat", xp));
+    await addXp(player.id, "combat", xp);
     const tier2 = (await quests()).combatTier;
     assert.equal(tier2.tier, 2);
     assert.equal(tier2.next?.tier, 3);

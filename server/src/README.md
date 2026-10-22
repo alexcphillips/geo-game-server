@@ -376,8 +376,8 @@ From the repo root, add `--workspace @geo/server` (or run them in `server/`):
 | --- | --- |
 | `npm test` | engine, content and spawn tests (no database needed) |
 | `npm run wipe:geo -- --yes` | resets every player's progress to the starter kit, keeping accounts (local only; no `--yes` = dry run) |
-| `npm run smoke:geo` | the whole API against the local database: sign-up to a won fight |
-| `npm run smoke:geo-economy` | vendors, the Market and elections against the local database |
+| `npm run smoke:geo` | the whole API against the Worker (`npm run dev:worker`, or `-- --url <base>`): sign-up to a won fight |
+| `npm run smoke:geo-economy` | vendors, the Market and elections against the Worker |
 | `npm run smoke:geo-suggestions` | location suggestions: sending, admin review and corrections, audit |
 | `npm run smoke:geo-places` | hand-made places: admin make, edit, hide, remove; players' nearby list; from a suggestion |
 | `npm run geo:admin -- <email>` | makes that account a game admin (`--revoke` to undo) |

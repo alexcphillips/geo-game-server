@@ -5,7 +5,6 @@ import {
     type GeoAdminSuggestionsResponse,
     type GeoSuggestionRequest,
 } from "@geo/shared";
-import { pool } from "../db";
 import { startSmokeServer, step } from "./smoke-kit";
 
 /**
@@ -13,11 +12,11 @@ import { startSmokeServer, step } from "./smoke-kit";
  * admin lists, accepts and reopens it, and players can't reach the admin side.
  */
 async function main() {
-    const { call, registerPlayer, stop } = await startSmokeServer();
+    const { call, registerPlayer, sql, makeAdmin, stop } = await startSmokeServer();
     try {
         const player = await registerPlayer("suggest");
         const admin = await registerPlayer("admin");
-        await pool.query(`UPDATE geo.players SET role = 'admin' WHERE id = $1`, [admin.player.id]);
+        await makeAdmin(admin.player.id);
 
         const request: GeoSuggestionRequest = {
             kind: "fishing",
@@ -62,8 +61,8 @@ async function main() {
         assert.equal(reopened.body.reviewedAt, null);
         step("an admin rejects it, then reopens it");
 
-        const audit = await pool.query(`SELECT 1 FROM geo.admin_actions WHERE action = 'review-suggestion' AND target = $1`, [created.body.id]);
-        assert.equal(audit.rowCount, 2);
+        const audit = await sql(`SELECT 1 FROM admin_actions WHERE action = 'review-suggestion' AND target = ?`, [created.body.id]);
+        assert.equal(audit.length, 2);
         step("both reviews are audited");
 
         assert.equal(mine.originalLatitude, null, "never moved, so no original pin");
@@ -80,11 +79,11 @@ async function main() {
         assert.equal(movedAgain.body.originalLatitude, 51.5007, "a second move keeps the first pin");
         assert.equal(movedAgain.body.originalLongitude, -0.1246);
         assert.equal(movedAgain.body.note, "pond behind the library", "the note is the player's");
-        const adjusts = await pool.query(`SELECT 1 FROM geo.admin_actions WHERE action = 'adjust-suggestion' AND target = $1`, [created.body.id]);
-        assert.equal(adjusts.rowCount, 2);
+        const adjusts = await sql(`SELECT 1 FROM admin_actions WHERE action = 'adjust-suggestion' AND target = ?`, [created.body.id]);
+        assert.equal(adjusts.length, 2);
         step("an admin moves its pin and changes its kind; the player's pin is kept, both audited");
 
-        await pool.query(`DELETE FROM geo.location_suggestions WHERE id = $1`, [created.body.id]);
+        await sql(`DELETE FROM location_suggestions WHERE id = ?`, [created.body.id]);
     } finally {
         await stop();
     }

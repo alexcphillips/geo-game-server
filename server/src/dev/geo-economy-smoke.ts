@@ -13,7 +13,6 @@ import {
     type GeoSocketTopic,
     type GeoVendorsResponse,
 } from "@geo/shared";
-import { pool } from "../db";
 import { CONTENT, sellValueOf } from "../content";
 import { startSmokeServer, step } from "./smoke-kit";
 
@@ -26,7 +25,7 @@ import { startSmokeServer, step } from "./smoke-kit";
  * Dev only. It ends the running election twice and puts Marlon back in office
  * at the end, so the dev server's mayor is as most tests expect.
  */
-const { call, registerPlayer, grant, openSocket, stop } = await startSmokeServer();
+const { call, registerPlayer, grant, openSocket, sql, makeAdmin, stop } = await startSmokeServer();
 
 /** The hint that `topic` changed, for anyone watching it. */
 const changed = (topic: GeoSocketTopic) => (m: GeoSocketServerMessage): m is GeoSocketServerMessage => m.type === "changed" && m.topic === topic;
@@ -51,7 +50,7 @@ try {
     const seller = await registerPlayer("seller");
     const buyer = await registerPlayer("buyer");
     const adminSession = await registerPlayer("admin");
-    await pool.query(`UPDATE geo.players SET role = 'admin' WHERE id = $1`, [adminSession.player.id]);
+    await makeAdmin(adminSession.player.id);
     const [A, B, C] = [seller.accessToken, buyer.accessToken, adminSession.accessToken];
     await grant(seller.player.id, [
         { itemId: "bones", quantity: 31 },
@@ -72,7 +71,7 @@ try {
         assert.equal(granted.status, 200, JSON.stringify(granted.body));
     }
     expectRefusal(
-        await call("POST", fill(GEO_API_PATHS.admin.playerCoins, { playerId: B }), C, { amount: -5_000 }),
+        await call("POST", fill(GEO_API_PATHS.admin.playerCoins, { playerId: buyer.player.id }), C, { amount: -5_000 }),
         400,
     );
     assert.equal(await coinsOf(B), 1_000);
@@ -191,7 +190,7 @@ try {
     step(`B bid ${swordFloor}, C outbid at ${after.minBid} and B got their coins back; a bid auction can't be cancelled`);
 
     // The anti-snipe rule: a bid in the last 10 minutes pushes the end out.
-    await pool.query(`UPDATE geo.market_listings SET ends_at = now() + interval '2 minutes' WHERE id = $1`, [auction.id]);
+    await sql(`UPDATE market_listings SET ends_at = ? WHERE id = ?`, [Date.now() + 2 * 60_000, auction.id]);
     const third = (await call<GeoMarketResponse>("GET", GEO_API_PATHS.market.root, B)).body.listings.find((l) => l.id === auction.id);
     assert.ok(third && third.type === "auction");
     assert.equal((await bid(B, third.minBid)).status, 200);
@@ -202,7 +201,7 @@ try {
     step("a bid with 2 minutes left pushed the end to 10 minutes after it");
 
     // Settle: time's up, B wins.
-    await pool.query(`UPDATE geo.market_listings SET ends_at = now() - interval '1 second' WHERE id = $1`, [auction.id]);
+    await sql(`UPDATE market_listings SET ends_at = ? WHERE id = ?`, [Date.now() - 1000, auction.id]);
     const own = (await call<GeoOwnListing[]>("GET", GEO_API_PATHS.market.mine, A)).body;
     const sold = own.find((listing) => listing.id === auction.id);
     assert.equal(sold?.status, "sold");
@@ -278,15 +277,15 @@ try {
     assert.ok(leaverListing);
     const cBeforeLeave = await coinsOf(C);
     assert.equal((await call("POST", fill(GEO_API_PATHS.market.bids, { listingId: leaverListing.id }), C, { amount: 40 })).status, 200);
-    await pool.query(`DELETE FROM geo.players WHERE id = $1`, [leaver.player.id]);
+    await sql(`DELETE FROM players WHERE id = ?`, [leaver.player.id]);
     assert.equal(await coinsOf(C), cBeforeLeave, "the bid came back when the seller's account went");
     step("a seller's account deleted mid-auction: the bidder got their held coins back");
 
     // Ledger: every player's coins are the sum of their ledger.
     for (const player of [seller, buyer, adminSession]) {
-        const { rows } = await pool.query<{ coins: string; ledger: string }>(
-            `SELECT p.coins, COALESCE((SELECT SUM(delta) FROM geo.coin_ledger WHERE player_id = p.id), 0) AS ledger
-             FROM geo.players p WHERE p.id = $1`,
+        const rows = await sql<{ coins: number; ledger: number }>(
+            `SELECT p.coins, COALESCE((SELECT SUM(delta) FROM coin_ledger WHERE player_id = p.id), 0) AS ledger
+             FROM players p WHERE p.id = ?`,
             [player.player.id],
         );
         assert.equal(Number(rows[0]?.coins), Number(rows[0]?.ledger), `${player.player.displayName}'s ledger explains their coins`);
@@ -325,7 +324,7 @@ try {
     step(`B voted ${first.name} (heard over the socket); a second vote, for anyone, is refused`);
 
     // A vote worth 2: what a vote-weight talisman would do.
-    await pool.query(`UPDATE geo.election_votes SET weight = 2 WHERE election_id = $1 AND player_id = $2`, [
+    await sql(`UPDATE election_votes SET weight = 2 WHERE election_id = ? AND player_id = ?`, [
         election.id,
         buyer.player.id,
     ]);
@@ -337,7 +336,8 @@ try {
     const winnerId = firstVotes > secondVotes ? first.id : second.id;
 
     expectRefusal(await call("POST", GEO_API_PATHS.admin.endElection, B), 403);
-    const { rows: [clock] } = await pool.query<{ now: Date }>(`SELECT now() AS now`);
+    // The World's clock may be a little off this machine's.
+    const since = Date.now() - 60_000;
     const ended = await call<GeoMayorResponse>("POST", GEO_API_PATHS.admin.endElection, C);
     assert.equal(ended.status, 200);
     const sameTotals = firstVotes === secondVotes;
@@ -347,10 +347,7 @@ try {
     expectRefusal(await vote(A, first.id), 400, "closed");
     step(`the election closed: ${ended.body.mayor.name} took office (${firstVotes} v ${secondVotes}); a new one opened`);
 
-    const { rows: announced } = await pool.query<{ title: string }>(
-        `SELECT title FROM geo.announcements WHERE kind = 'mayor' AND created_at >= $1`,
-        [clock!.now],
-    );
+    const announced = await sql<{ title: string }>(`SELECT title FROM announcements WHERE kind = 'mayor' AND created_at >= ?`, [since]);
     assert.ok(announced.some((row) => row.title.startsWith(ended.body.mayor.name)), JSON.stringify(announced));
     step("every inbox is told who won");
 
@@ -371,7 +368,7 @@ try {
         }
     }
     // The test's elections aren't news: their announcements go too.
-    await pool.query(`DELETE FROM geo.announcements WHERE kind = 'mayor' AND created_at >= $1`, [clock!.now]);
+    await sql(`DELETE FROM announcements WHERE kind = 'mayor' AND created_at >= ?`, [since]);
     step("Marlon is back in office for the dev server");
 
     console.log("\nAll geo economy smoke checks passed.");

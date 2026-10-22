@@ -11,4 +11,19 @@ export const GEO_OPS_PATHS = {
     sql: "/geo/ops/sql",
     /** POST { playerId, items }: items straight into an inventory; the new row ids. Only while GEO_DEV_TOOLS is on. */
     grant: "/geo/ops/grant",
+    // The rest, dev tools only too: what a smoke suite did through the Express server's own functions.
+    /** POST { playerId, amount, reason?, reference? }: coins through the ledger (addCoins). */
+    coins: "/geo/ops/coins",
+    /** POST { playerId, skill, amount }: skill XP, and the active pet's share (addSkillXp). */
+    xp: "/geo/ops/xp",
+    /** POST { playerId, events }: quest progress, as a won fight records it (recordQuestEvents). */
+    questEvents: "/geo/ops/quest-events",
+    /** POST { playerId }: the player's own stat modifiers (gear, pet, talismans); { modifiers }. */
+    modifiers: "/geo/ops/modifiers",
+    /** POST { at }: pays out farm weeks finished by `at` (ms), as the Monday job does; { nextAt }. */
+    farmWeeks: "/geo/ops/farm-weeks",
+    /** POST { at? }: runs every due job by `at` (ms; default now), as the alarm does. */
+    jobs: "/geo/ops/jobs",
+    /** POST { playerId, seconds }: moves the player's spawns' out-of-reach countdowns that far on (World memory). */
+    spawnClock: "/geo/ops/spawn-clock",
 } as const;
