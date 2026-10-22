@@ -14,6 +14,7 @@ import {
     REVOKE_REFRESH_TOKEN_BY_HASH,
 } from "./accounts.sql.ts";
 import type { CredentialsRow, PlayerRow, RefreshTokenRow } from "./accounts.types";
+import { grantStarterKit } from "./starter-kit";
 
 const DAY_MS = 24 * 60 * 60_000;
 
@@ -42,9 +43,9 @@ export function storeRefreshToken(db: Db, playerId: string, tokenHash: string) {
 export type RegisterResult = { ok: true; player: PlayerRow } | { ok: false; taken: "email" | "displayName" };
 
 /**
- * Makes a player and stores their first refresh token, all or nothing. The
- * checks and the insert run together, so two sign-ups racing for a name
- * can't both win.
+ * Makes a player with the starter kit and stores their first refresh token,
+ * all or nothing. The checks and the insert run together, so two sign-ups
+ * racing for a name can't both win.
  */
 export function register(
     db: Db,
@@ -55,7 +56,7 @@ export function register(
         if (db.one(DISPLAY_NAME_TAKEN, input.displayName)) return { ok: false, taken: "displayName" };
         const player = db.one<PlayerRow>(INSERT_PLAYER, crypto.randomUUID(), input.email, input.passwordHash, input.displayName, Date.now());
         if (!player) throw new Error("Player insert returned nothing");
-        // TODO(session 2): the starter kit, once inventory, wardrobe and hands are here.
+        grantStarterKit(db, player.id);
         storeRefreshToken(db, player.id, input.refreshTokenHash);
         return { ok: true, player };
     });

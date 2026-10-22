@@ -1,11 +1,10 @@
 import { query } from "../db";
-import { CONTENT, FIRST_MAYOR_ID, GAME_CONFIG, reforgeModifiers } from "../content";
 import type { MayorDef } from "../content/content.types";
-import { CORE_STATS, type StatModifier } from "../engine/engine.types";
+import type { StatModifier } from "../engine/engine.types";
 import { applyModifiers } from "../engine/stats";
 import type { TxQuery } from "../db/transaction";
-import { activePetModifiers } from "../pets/pets";
 import * as playerRepository from "../modules/player/geo-player.repository";
+import { maxHealthFrom, mayorModifiers, mayorOf, ownModifiersFrom } from "./modifiers";
 
 export { applyModifiers };
 
@@ -18,7 +17,8 @@ export { applyModifiers };
  *     const eelChance = applyModifiers(BASE_EEL_CHANCE, modifiers, "eelChance");
  *
  * They are StatModifiers, the same as gear and talismans use, so one rule
- * reads one list and doesn't care where a bonus came from.
+ * reads one list and doesn't care where a bonus came from. The maths is in
+ * `modifiers.ts`, shared with the Worker; this file only loads from Postgres.
  */
 
 /** The mayor in office: the last finished election's winner, or the first mayor. */
@@ -39,8 +39,7 @@ let cached: { mayor: MayorDef; at: number } | null = null;
 export async function currentMayor(tx: TxQuery = query): Promise<MayorDef> {
     if (cached && Date.now() - cached.at < CACHE_MS) return cached.mayor;
     const [row] = await tx<{ winner_id: string }>(CURRENT_MAYOR);
-    // A mayor since removed from content falls back rather than breaking.
-    const mayor = CONTENT.mayors[row?.winner_id ?? FIRST_MAYOR_ID] ?? (CONTENT.mayors[FIRST_MAYOR_ID] as MayorDef);
+    const mayor = mayorOf(row?.winner_id);
     cached = { mayor, at: Date.now() };
     return mayor;
 }
@@ -52,8 +51,7 @@ export function forgetMayor() {
 
 /** Every global modifier now: the mayor's perks. Events and the like would join here. */
 export async function globalModifiers(tx: TxQuery = query): Promise<StatModifier[]> {
-    const mayor = await currentMayor(tx);
-    return mayor.perks.flatMap((perk) => perk.modifiers);
+    return mayorModifiers(await currentMayor(tx));
 }
 
 /** Modifiers from a player's own gear, the talismans in their bag, and their active pet. */
@@ -68,15 +66,11 @@ export async function ownModifiers(playerId: string, tx: TxQuery = query): Promi
         tx,
     );
 
-    const itemIds = [...worn.map((row) => row.item_id), ...new Set(bag.map((entry) => entry.item_id))];
-    return [
-        ...itemIds.flatMap((itemId) => {
-            const item = CONTENT.items[itemId];
-            return item && (item.kind === "equipment" || item.kind === "talisman") ? (item.modifiers ?? []) : [];
-        }),
-        ...worn.flatMap((row) => reforgeModifiers(CONTENT, row.item_id, row.reforge)),
-        ...activePetModifiers(pet ?? undefined),
-    ];
+    return ownModifiersFrom({
+        worn: worn.map((row) => ({ itemId: row.item_id, reforge: row.reforge })),
+        talismans: bag.map((entry) => entry.item_id),
+        pet: pet ?? undefined,
+    });
 }
 
 /** Everything that changes a player's stats outside a fight: global effects, then their own. */
@@ -86,6 +80,5 @@ export async function playerModifiers(playerId: string, tx: TxQuery = query): Pr
 
 /** The player's max health from their gear right now, as a fight would start them. */
 export async function playerMaxHealth(playerId: string, tx: TxQuery = query): Promise<number> {
-    const base = GAME_CONFIG.player.baseStats[CORE_STATS.maxHealth] ?? 0;
-    return Math.round(applyModifiers(base, await playerModifiers(playerId, tx), CORE_STATS.maxHealth));
+    return maxHealthFrom(await playerModifiers(playerId, tx));
 }

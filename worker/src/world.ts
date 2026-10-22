@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { createApp } from "./app";
+import { createApp, type World as WorldState } from "./app";
 import { Db } from "./db/db";
 import { migrate } from "./db/schema";
 import type { Env } from "./env";
@@ -11,6 +11,8 @@ import type { Env } from "./env";
  */
 export class World extends DurableObject<Env> {
     readonly db: Db;
+    /** What routes see: the database, settings, and what's kept in memory. */
+    readonly state: WorldState;
     private readonly app: ReturnType<typeof createApp>;
 
     constructor(ctx: DurableObjectState, env: Env) {
@@ -18,7 +20,8 @@ export class World extends DurableObject<Env> {
         this.db = new Db(ctx.storage);
         // Nothing is served until the schema is current.
         ctx.blockConcurrencyWhile(async () => migrate(this.db));
-        this.app = createApp({ db: this.db, env });
+        this.state = { db: this.db, env, lastHeard: new Map(), travel: new Map() };
+        this.app = createApp(this.state);
     }
 
     override fetch(request: Request): Promise<Response> {

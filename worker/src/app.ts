@@ -1,13 +1,30 @@
 import { Hono } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { AppError } from "../../server/src/http/AppError";
+import type { GeoRole } from "@geo/shared";
 import type { Db } from "./db/db";
 import type { Env } from "./env";
 import { accountsRoutes } from "./modules/accounts/accounts.routes";
+import { placesRoutes } from "./modules/places/places.routes";
+import { playerRoutes } from "./modules/player/player.routes";
+import { wardrobeRoutes } from "./modules/wardrobe/wardrobe.routes";
+import type { TravelMemory } from "./modules/world/world.types";
+import { worldRoutes } from "./modules/world/world.routes";
 
-/** What every route can reach: the World's database and the Worker's settings. */
-export type World = { db: Db; env: Env };
-export type AppEnv = { Variables: { world: World; playerId?: string } };
+/**
+ * What every route can reach: the World's database, the Worker's settings,
+ * and what the World keeps in memory instead of writing rows (forgotten on
+ * a restart, which costs nothing that matters).
+ */
+export type World = {
+    db: Db;
+    env: Env;
+    /** When each player was last heard from (any signed-in request): presence. */
+    lastHeard: Map<string, number>;
+    /** Each player's last point and walked distance, for spawns (world/travel.ts). */
+    travel: Map<string, TravelMemory>;
+};
+export type AppEnv = { Variables: { world: World; playerId?: string; role?: GeoRole } };
 
 /**
  * The API, mounted in the World object. Routes and their paths are the same
@@ -22,6 +39,10 @@ export function createApp(world: World) {
     });
 
     app.route("/", accountsRoutes);
+    app.route("/", playerRoutes);
+    app.route("/", wardrobeRoutes);
+    app.route("/", worldRoutes);
+    app.route("/", placesRoutes);
 
     app.notFound((c) => c.json({ error: `No route for ${c.req.method} ${new URL(c.req.url).pathname}` }, 404));
 
