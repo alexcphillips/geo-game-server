@@ -1,0 +1,25 @@
+{
+    "name": "@geo/game",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "imports": {
+        "#geo/models": "./src/content/models.ts"
+    },
+    "scripts": {
+        "data:index": "tsx src/dev/geo-data-index.ts",
+        "typecheck": "tsc -p tsconfig.json",
+        "test": "node --import tsx --test \"src/**/*.test.ts\"",
+        "geo:sell-values": "tsx src/dev/geo-sell-values.ts",
+        "geo:data": "tsx src/dev/geo-data.ts"
+    },
+    "dependencies": {
+        "@geo/shared": "*",
+        "zod": "^4.6.6"
+    },
+    "devDependencies": {
+        "@types/node": "^24.10.1",
+        "tsx": "^4.22.3",
+        "typescript": "~5.9.3"
+    }
+}

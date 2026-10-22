@@ -1,6 +1,6 @@
 import type { GeoDungeonRunStatus } from "@geo/shared";
-import type { DungeonMap } from "../../../../server/src/dungeons/dungeon-map";
-import type { MemberState, PartyState } from "../../../../server/src/dungeons/dungeon-run";
+import type { DungeonMap } from "../../../../game/src/dungeons/dungeon-map";
+import type { MemberState, PartyState } from "../../../../game/src/dungeons/dungeon-run";
 
 /** A `dungeon_runs` row as SQLite returns it: `map` and `state` are JSON. */
 export type DungeonRunRecord = { id: string; dungeon_id: string; status: GeoDungeonRunStatus; map: string; state: string; version: number };

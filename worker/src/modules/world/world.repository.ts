@@ -1,6 +1,6 @@
 import { distanceMetres, type GeoPoint, type GeoSpawn } from "@geo/shared";
-import { CONTENT } from "../../../../server/src/content";
-import { createRng, randomSeed } from "../../../../server/src/engine/rng";
+import { CONTENT } from "../../../../game/src/content";
+import { createRng, randomSeed } from "../../../../game/src/engine/rng";
 import {
     MAX_SPAWNS,
     randomPointNear,
@@ -8,8 +8,8 @@ import {
     rollSpawn,
     SPAWN_RULES,
     type NearPlaces,
-} from "../../../../server/src/world/spawns";
-import { advanceTravel, spendTravel } from "../../../../server/src/world/travel";
+} from "../../../../game/src/world/spawns";
+import { advanceTravel, spendTravel } from "../../../../game/src/world/travel";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import * as questsRepository from "../quests/quests.repository";
@@ -17,7 +17,7 @@ import { CLAIM_SPAWN, DELETE_SPAWNS, FIND_LIVE_SPAWN, FIND_SPAWNS, INSERT_SPAWN 
 import type { SpawnRow, TravelMemory } from "./world.types";
 
 /**
- * Each player's spawns, from server/src/modules/world/geo-world.repository.ts.
+ * Each player's spawns.
  * Rows are written only when a spawn appears, is beaten or goes; where the
  * player walks and when they left a spawn's reach stay in World memory.
  */

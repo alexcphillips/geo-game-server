@@ -1,5 +1,5 @@
 import type { GeoAdminAnnouncement, GeoAnnouncement, GeoInboxMessage, GeoInboxResponse } from "@geo/shared";
-import type { NewAnnouncement, NewMessage } from "../../../../server/src/modules/inbox/geo-inbox.types";
+import type { NewAnnouncement, NewMessage } from "../../../../game/src/modules/inbox/geo-inbox.types";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import {
@@ -15,7 +15,7 @@ import {
 } from "./inbox.sql.ts";
 import type { AnnouncementRecord, MessageRecord } from "./inbox.types";
 
-/** Mail and announcements, from server/src/modules/inbox/geo-inbox.repository.ts. */
+/** Mail and announcements. */
 
 const iso = (ms: number) => new Date(ms).toISOString();
 

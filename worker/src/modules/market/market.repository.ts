@@ -5,6 +5,7 @@ import {
     geoBinTax,
     geoMinBid,
     type GeoAuctionHours,
+    type GeoListingType,
     type GeoBid,
     type GeoMarketListing,
     type GeoMarketResponse,
@@ -12,11 +13,10 @@ import {
     type GeoOwnListing,
     type GeoSale,
 } from "@geo/shared";
-import { CONTENT, sellValueOf } from "../../../../server/src/content";
-import { isStackable } from "../../../../server/src/content/content.types";
-import { AppError } from "../../../../server/src/http/AppError";
-import type { NewListing } from "../../../../server/src/modules/market/geo-market.repository";
-import { NEW_PET, petState, type PetCopy } from "../../../../server/src/pets/pets";
+import { CONTENT, sellValueOf } from "../../../../game/src/content";
+import { isStackable } from "../../../../game/src/content/content.types";
+import { AppError } from "../../../../game/src/http/AppError";
+import { NEW_PET, petState, type PetCopy } from "../../../../game/src/pets/pets";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import { schedule } from "../jobs/jobs.repository";
@@ -45,9 +45,18 @@ import {
 } from "./market.sql.ts";
 import type { BidRecord, ListingRecord, SaleRecord, StackListingRecord, StackOfferRecord } from "./market.types";
 
+export type NewListing = {
+    inventoryId: string;
+    type: GeoListingType;
+    quantity: number;
+    /** Buy-it-now, per unit. */
+    price?: number;
+    startingBid?: number;
+    hours?: GeoAuctionHours;
+};
+
 /**
- * The Market, from server/src/modules/market/geo-market.repository.ts. One
- * World runs one request at a time, so a listing read inside a transaction
+ * The Market. One World runs one request at a time, so a listing read inside a transaction
  * is as good as a locked one. An auction's end is its `auction:<id>` row of
  * the `due` table (moved by an anti-snipe bid): the alarm settles it on time,
  * and reads settle any the alarm hasn't reached yet.

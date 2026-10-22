@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import type { GeoContentResponse } from "@geo/shared";
-import { contentBody } from "../../../../server/src/modules/content/geo-content.controller";
+import { contentBody } from "../../../../game/src/content/content-body";
 import type { AppEnv } from "../../app";
 
 type Ctx = Context<AppEnv>;

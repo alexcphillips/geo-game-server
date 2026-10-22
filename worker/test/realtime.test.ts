@@ -10,7 +10,7 @@ import {
     type GeoFriendsResponse,
     type GeoSocketServerMessage,
 } from "@geo/shared";
-import { IDLE_MS, OFFLINE_GRACE_MS } from "../src/realtime/hub";
+import { IDLE_MS, OFFLINE_GRACE_MS } from "../src/realtime/timing";
 import { runDueJobs } from "../src/jobs";
 import { goneSince } from "../src/realtime/presence";
 import { dueAt } from "../src/modules/jobs/jobs.repository";

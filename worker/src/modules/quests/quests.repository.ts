@@ -1,6 +1,6 @@
 import type { GeoQuestsResponse, GeoQuestView } from "@geo/shared";
-import { CONTENT, type QuestDef } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
+import { CONTENT, type QuestDef } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
 import {
     combatTierView,
     isComplete,
@@ -14,12 +14,12 @@ import {
     type QuestEvent,
     type QuestHistory,
     type QuestProgress,
-} from "../../../../server/src/modules/quests/geo-quests.rules";
+} from "../../../../game/src/modules/quests/geo-quests.rules";
 import type { Db } from "../../db/db";
 import { addCoins, findSkillLevels, grantItems } from "../player/player.repository";
 import { CLAIM_QUEST, FIND_QUEST_HISTORY, FIND_QUESTS, INSERT_QUEST, SET_PROGRESS, SET_TRACKED } from "./quests.sql.ts";
 
-/** The quest log, from server/src/modules/quests/geo-quests.repository.ts. */
+/** The quest log. */
 
 type QuestRow = { quest_id: string; progress: string; tracked: number; started_at: number; claimed_at: number | null };
 

@@ -1,8 +1,9 @@
 # @geo/worker
 
-geo-game on Cloudflare's free plan, replacing the Express server module by
-module (the plan is in the "geo-game Backend TODO" doc, "Hosting: move to
-Cloudflare"). Live at https://geo-game.alexphillipsdev.workers.dev.
+geo-game's backend: a Worker and one Durable Object with SQLite, on
+Cloudflare's free plan. Live at https://geo-game.alexphillipsdev.workers.dev.
+The game's rules and content are `@geo/game` (`game/src`), imported by
+relative path; this package is everything that stores, serves and schedules.
 
 ```
 src/
@@ -18,7 +19,7 @@ src/
 ├── lib/            PBKDF2 passwords, jose tokens, the secret spawn seed (all Web Crypto)
 ├── realtime/       the geo socket: hub.ts (hibernating sockets, who's connected, pushes), presence.ts (sign-in
 │                   snapshots, what coming and going changes), socket.routes.ts (the upgrade at /geo/socket)
-└── modules/        four-file modules, as in server/ (routes, controller, repository, sql)
+└── modules/        four-file modules (routes, controller, repository, sql)
     ├── content/    GET /geo/content (built once per World instance) and /geo/health
     ├── accounts/   sign-up (with the starter kit), sign-in, refresh, sign-out
     ├── player/     /geo/me: gear, bag, hands, lunchbox (and eating from it), bait, camp, bank, pets
@@ -41,11 +42,9 @@ src/
     ├── admin/      game-admin tools, every change audited
     ├── ops/        the operator's routes behind GEO_OPS_SECRET: first admin, wipe, and (dev tools only) SQL and grants
     └── jobs/       the `due` table: schedule(key, at)
+scripts/            Node scripts against a running Worker (own tsconfig): the smoke suites (smoke-kit.ts),
+                    geo:admin, wipe:geo, all through ops-client.ts
 ```
-
-Pure game code (content, engine, AppError, account rules, spawns and travel,
-stat sheet, modifier maths in `world/modifiers.ts`) is imported from
-`server/src` until the Express server is retired.
 
 ## Rules
 
@@ -93,11 +92,12 @@ stat sheet, modifier maths in `world/modifiers.ts`) is imported from
   `GEO_DEV_TOOLS` is `"true"`: off in wrangler.jsonc (workers.dev), on in
   `.dev.vars` (wrangler dev) and the tests.
 - **Operator routes** (`/geo/ops/*`, `modules/ops/ops.paths.ts`) answer only
-  with `Authorization: Bearer <GEO_OPS_SECRET>` (404 otherwise). The dev
-  scripts reach them with `--url <base>` and GEO_OPS_SECRET in the root
-  `.env`: `npm run geo:admin -- you@example.com --url …`, `npm run wipe:geo
-  -- --url … [--yes]`, and any smoke suite (`-- --url …` only where dev tools are on; without it, the
-  suites use `npm run dev:worker` at localhost:8787). The dev routes the
+  with `Authorization: Bearer <GEO_OPS_SECRET>` (404 otherwise). The
+  scripts reach them with GEO_OPS_SECRET from the root `.env`, on
+  `npm run dev:worker` (localhost:8787) unless given `--url <base>`:
+  `npm run geo:admin -- you@example.com [--url …]`, `npm run wipe:geo --
+  [--url …] [--yes]`, and any smoke suite (`--url` only where dev tools are
+  on, so not workers.dev). The dev routes the
   suites use (SQL, grants, coins, XP, quest events, modifiers, farm weeks,
   due jobs, the spawn clock) also need `GEO_DEV_TOOLS`, and the kit's calls
   skip the rate limits by sending the secret in `X-Geo-Ops`.
@@ -114,6 +114,9 @@ From the repo root:
 | `npm run test --workspace @geo/worker` | tests in workerd (Miniflare, local) |
 | `npm run dev:worker` | `wrangler dev` on localhost:8787 (reads `worker/.dev.vars`) |
 | `npm run deploy:worker` | deploys to Cloudflare |
+| `npm run smoke:geo-<area> --workspace @geo/worker` | an end-to-end suite against `npm run dev:worker`; the list is in `worker/package.json` |
+| `npm run geo:admin --workspace @geo/worker -- <email> [--revoke] [--url <base>]` | makes an account a game admin |
+| `npm run wipe:geo --workspace @geo/worker -- [--url <base>] [--yes]` | every player's progress back to the starter kit |
 | `npx wrangler tail geo-game --format json` (in `worker/`) | live requests, with CPU time per request |
 
 The deployed secrets are set with `wrangler secret put GEO_JWT_SECRET` and

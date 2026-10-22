@@ -1,12 +1,12 @@
 import type { Context } from "hono";
 import type { GeoLoginRequest, GeoLogoutRequest, GeoRefreshRequest, GeoRegisterRequest, GeoSession } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
+import { AppError } from "../../../../game/src/http/AppError";
 import {
     validateEmail,
     validatePassword,
     validateUsername,
     VALIDATION_MESSAGES,
-} from "../../../../server/src/lib/credentials";
+} from "../../../../game/src/lib/credentials";
 import type { AppEnv } from "../../app";
 import { jsonBody, readString } from "../../http/body";
 import { hashPassword, verifyPassword } from "../../lib/password";

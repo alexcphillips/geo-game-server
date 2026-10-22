@@ -1,5 +1,5 @@
-// From server/src/modules/world/geo-world.sql.ts. Travel and the
-// out-of-reach countdown are in World memory, so only spawns are here.
+// Travel and the out-of-reach countdown are in World memory, so only spawns
+// are here.
 
 const SPAWN_COLUMNS = `id, enemy_id, latitude, longitude, despawns_at, claimed_at, created_at`;
 

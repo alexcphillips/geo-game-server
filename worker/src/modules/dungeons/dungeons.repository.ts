@@ -6,10 +6,10 @@ import {
     type GeoRunResponse,
     type GeoStartDungeonLobbyResponse,
 } from "@geo/shared";
-import { CONTENT, type DungeonDef } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
-import { requiredLevelProblem } from "../../../../server/src/modules/dungeons/geo-dungeons.rules";
-import { hasArt } from "../../../../server/src/world/spawns";
+import { CONTENT, type DungeonDef } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
+import { requiredLevelProblem } from "../../../../game/src/modules/dungeons/geo-dungeons.rules";
+import { hasArt } from "../../../../game/src/world/spawns";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import { viewFor } from "../dungeon-runs/dungeon-runs.fights";
@@ -30,7 +30,7 @@ import {
 import type { LobbyRow, MemberRow } from "./dungeons.types";
 
 /**
- * Dungeon lobbies, from server/src/modules/dungeons/geo-dungeons.repository.ts.
+ * Dungeon lobbies.
  * Each function runs inside the caller's transaction.
  */
 

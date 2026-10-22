@@ -1,31 +1,34 @@
 # geo-game-server
 
-The backend for [geo-game](../geo-game): Express, Postgres and a WebSocket, all
-under `/geo`. It used to be a module inside cozy-app's server, and is moving to
-Cloudflare Workers, module by module.
+The backend for [geo-game](../geo-game): a Cloudflare Worker and one Durable
+Object with SQLite, on the free plan, all under `/geo`. Live at
+https://geo-game.alexphillipsdev.workers.dev.
 
 ```
 geo-game-server/
-├── server/   @geo/server: the API on Express + Postgres, serving the game today (see server/src/README.md)
-├── worker/   @geo/worker: the same API on Cloudflare Workers + SQLite, being ported (see worker/README.md)
+├── game/     @geo/game: the game itself, no I/O: combat engine, rules, all content (see game/src/README.md)
+├── worker/   @geo/worker: the Worker + World Durable Object: storage, API, clock, socket (see worker/README.md);
+│             worker/scripts/ has the smoke suites and the operator scripts
 └── shared/   @geo/shared: the API contracts; the app copies them with `npm run sync:contracts`
 ```
 
 ## Run it
 
-1. `cp .env.example .env` and fill it in. It needs a Postgres it can reach
-   (`DB_*`) and `GEO_JWT_SECRET`, which signs tokens and seeds spawns.
-2. `npm install`
-3. `npm run dev`: the server on port 3001, restarting on changes. The `geo`
-   schema is created or brought up to date at boot.
+1. `npm install`
+2. `worker/.dev.vars` holds the local secrets (`GEO_JWT_SECRET`, `GEO_OPS_SECRET`,
+   `GEO_DEV_TOOLS=true`); git ignores it. For the scripts, `cp .env.example .env`
+   and set `GEO_OPS_SECRET` to the same value.
+3. `npm run dev:worker`: `wrangler dev` on localhost:8787, reloading on changes.
+   The app reaches it with `EXPO_PUBLIC_API_URL=lan` (add `-- --ip 0.0.0.0`).
+4. `npm run deploy:worker` deploys.
 
 ## Check it
 
 | Command | Does |
 | --- | --- |
-| `npm run check` | data index, typecheck every workspace, eslint, server and Worker tests, then the content check |
-| `npm test` | server unit tests (no database needed) and Worker tests (in workerd) |
-| `npm run smoke:geo-<area> --workspace @geo/server` | an end-to-end suite against the Worker (`npm run dev:worker` first, or `-- --url <base>`); the list is in `server/package.json` |
+| `npm run check` | data index, typecheck every workspace, eslint, game and Worker tests, then the content check |
+| `npm test` | game tests (node:test) and Worker tests (in workerd) |
+| `npm run smoke:geo-<area> --workspace @geo/worker` | an end-to-end suite against `npm run dev:worker`; the list is in `worker/package.json` |
 
-Content (cards, items, enemies, tuning) is in `server/src/data/`; start with
+Content (cards, items, enemies, tuning) is in `game/src/data/`; start with
 its README.

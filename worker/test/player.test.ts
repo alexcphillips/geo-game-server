@@ -6,7 +6,7 @@ import {
     GEO_TALISMAN_BAG_PAGE_SIZE,
     type GeoMeResponse,
 } from "@geo/shared";
-import { GAME_CONFIG } from "../../server/src/content";
+import { GAME_CONFIG } from "../../game/src/content";
 import { addCoins } from "../src/modules/player/player.repository";
 import { amountOf, call, grant, inWorld, newPlayer, path, rowsWrittenBy } from "./helpers";
 

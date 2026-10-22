@@ -6,7 +6,7 @@ import {
     type GeoLoadoutAutoRequest,
     type GeoSaveLoadoutRequest,
 } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { AppEnv } from "../../app";
 import { jsonBody } from "../../http/body";
 import { changeMe } from "../player/player.controller";
@@ -14,7 +14,7 @@ import * as playerRepository from "../player/player.repository";
 import * as runsRepository from "../runs/runs.repository";
 import * as wardrobeRepository from "./wardrobe.repository";
 
-/** The wardrobe, from server/src/modules/wardrobe/geo-wardrobe.controller.ts. Every reply is the whole player. */
+/** The wardrobe. Every reply is the whole player. */
 
 type Ctx = Context<AppEnv>;
 

@@ -1,11 +1,11 @@
 import { GEO_ALREADY_VOTED, type GeoMayor, type GeoMayorResponse } from "@geo/shared";
-import { CONTENT, type MayorDef } from "../../../../server/src/content";
-import { applyModifiers } from "../../../../server/src/engine/stats";
-import type { StatModifier } from "../../../../server/src/engine/engine.types";
-import { AppError } from "../../../../server/src/http/AppError";
-import { nextElectionEnd, pickCandidates, pickWinner } from "../../../../server/src/modules/mayor/geo-mayor.rules";
-import type { TallyRow } from "../../../../server/src/modules/mayor/geo-mayor.types";
-import { mayorModifiers, mayorOf } from "../../../../server/src/world/modifiers";
+import { CONTENT, type MayorDef } from "../../../../game/src/content";
+import { applyModifiers } from "../../../../game/src/engine/stats";
+import type { StatModifier } from "../../../../game/src/engine/engine.types";
+import { AppError } from "../../../../game/src/http/AppError";
+import { nextElectionEnd, pickCandidates, pickWinner } from "../../../../game/src/modules/mayor/geo-mayor.rules";
+import type { TallyRow } from "../../../../game/src/modules/mayor/geo-mayor.types";
+import { mayorModifiers, mayorOf } from "../../../../game/src/world/modifiers";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import { insertAnnouncement } from "../inbox/inbox.repository";
@@ -25,8 +25,7 @@ import {
 import type { ElectionRecord, TallyRecord } from "./mayor.types";
 
 /**
- * The weekly election and the mayor in office, from
- * server/src/modules/mayor/geo-mayor.repository.ts. The open election's end
+ * The weekly election and the mayor in office. The open election's end
  * is the `election` row of the `due` table: the alarm closes it on time, and
  * every read closes it first if the alarm hasn't yet.
  */

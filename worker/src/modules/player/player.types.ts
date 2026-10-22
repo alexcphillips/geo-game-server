@@ -1,5 +1,5 @@
 import type { GeoRole } from "@geo/shared";
-import type { PetCopy } from "../../../../server/src/pets/pets";
+import type { PetCopy } from "../../../../game/src/pets/pets";
 
 /** Rows as SQLite returns them: snake_case, times in ms, JSON as text. */
 

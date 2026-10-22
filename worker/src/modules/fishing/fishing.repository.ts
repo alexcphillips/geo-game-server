@@ -1,8 +1,8 @@
 import type { GeoFishingAction, GeoFishingRunView, GeoFishingTier } from "@geo/shared";
-import { CHUM_BAIT_IDS, CONTENT } from "../../../../server/src/content";
-import { fishItemId, isFishingCardId, qualityFishItemId, type RodDef } from "../../../../server/src/content/fishing";
-import { randomSeed } from "../../../../server/src/engine/rng";
-import { fishingOdds } from "../../../../server/src/fishing/fishing";
+import { CHUM_BAIT_IDS, CONTENT } from "../../../../game/src/content";
+import { fishItemId, isFishingCardId, qualityFishItemId, type RodDef } from "../../../../game/src/content/fishing";
+import { randomSeed } from "../../../../game/src/engine/rng";
+import { fishingOdds } from "../../../../game/src/fishing/fishing";
 import {
     FishingRuleError,
     newFishingState,
@@ -11,9 +11,9 @@ import {
     type FishingHandCard,
     type FishingSetup,
     type FishingState,
-} from "../../../../server/src/fishing/fishing-run";
-import { AppError } from "../../../../server/src/http/AppError";
-import { toFishingView } from "../../../../server/src/modules/fishing/geo-fishing.view";
+} from "../../../../game/src/fishing/fishing-run";
+import { AppError } from "../../../../game/src/http/AppError";
+import { toFishingView } from "../../../../game/src/modules/fishing/geo-fishing.view";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import { assertNotInDungeon } from "../dungeon-runs/dungeon-runs.fights";
@@ -25,7 +25,7 @@ import { autoSwap } from "../wardrobe/wardrobe.repository";
 import { ALWAYS_SEA_CREATURES } from "./fishing.sql.ts";
 
 /**
- * Fishing Runs, from server/src/modules/fishing/geo-fishing.repository.ts.
+ * Fishing Runs.
  * They share the `runs` table with combat, with their own state. Each
  * function runs inside the caller's transaction.
  */

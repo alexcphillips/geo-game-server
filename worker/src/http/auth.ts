@@ -1,6 +1,6 @@
 import type { Context, MiddlewareHandler } from "hono";
 import type { GeoRole } from "@geo/shared";
-import { AppError } from "../../../server/src/http/AppError";
+import { AppError } from "../../../game/src/http/AppError";
 import type { AppEnv } from "../app";
 import { verifyAccessToken } from "../lib/tokens";
 

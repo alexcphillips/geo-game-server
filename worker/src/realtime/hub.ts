@@ -2,7 +2,6 @@ import {
     GEO_SOCKET_AUTH_SECONDS,
     GEO_SOCKET_CLOSE,
     GEO_SOCKET_PING,
-    GEO_SOCKET_PING_SECONDS,
     GEO_SOCKET_PONG,
     GEO_SOCKET_REAUTH_SECONDS,
     type GeoActivity,
@@ -11,11 +10,11 @@ import {
     type GeoSocketServerMessage,
     type GeoSocketTopic,
 } from "@geo/shared";
+import { IDLE_MS, OFFLINE_GRACE_MS } from "./timing";
 
 /**
- * The geo socket on the World object: server/src/realtime/geo-socket.ts and
- * geo-socket-hub.ts, with Cloudflare's hibernating WebSockets. The protocol
- * is `realtime.contract.ts`, unchanged.
+ * The geo socket on the World object, with Cloudflare's hibernating
+ * WebSockets. The protocol is `realtime.contract.ts`.
  *
  * Hibernation: while nobody does anything, the World leaves memory and its
  * sockets stay open; the next message, close or alarm starts it again. So
@@ -34,14 +33,6 @@ import {
  * (`sweep`), which is before anything reads presence.
  */
 
-/** Silent this long (no ping, nothing): the phone is gone without saying so. Two missed pings and a bit. */
-export const IDLE_MS = (GEO_SOCKET_PING_SECONDS * 2 + 10) * 1000;
-/**
- * A last socket closing waits this long before the player counts as gone,
- * so a reconnect (a fresh token, a blip in signal) isn't an offline and
- * online again for their friends, turn clock and party.
- */
-export const OFFLINE_GRACE_MS = 10_000;
 const AUTH_MS = GEO_SOCKET_AUTH_SECONDS * 1000;
 const REAUTH_MS = GEO_SOCKET_REAUTH_SECONDS * 1000;
 /** auth is a token and a few bytes; anything big is not ours. */

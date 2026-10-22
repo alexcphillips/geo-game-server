@@ -1,6 +1,6 @@
 /**
  * A 32-bit seed the server can always recompute from `key`, but nobody
- * without the secret can predict (server/src/lib/geo-secret.ts, same
+ * without the secret can predict (the Express server's
  * HMAC-SHA256, first 4 bytes little-endian), so spawns are stable and
  * checkable, yet can't be scouted from the app's code. Async (Web Crypto):
  * work it out before a transaction, not inside one.

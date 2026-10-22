@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GEO_API_PATHS, type GeoMeResponse } from "@geo/shared";
-import { GAME_CONFIG } from "../../server/src/content";
+import { GAME_CONFIG } from "../../game/src/content";
 import { addCoins } from "../src/modules/player/player.repository";
 import { autoSwap } from "../src/modules/wardrobe/wardrobe.repository";
 import { call, inWorld, newPlayer, path } from "./helpers";

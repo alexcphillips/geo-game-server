@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import { GEO_FISHING_ACTION_TYPES, GEO_FISHING_TIERS, type GeoFishingAction, type GeoFishingTier } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";

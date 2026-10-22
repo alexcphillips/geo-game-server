@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GEO_API_PATHS, type GeoPlacesResponse, type GeoWorldResponse } from "@geo/shared";
-import { MAX_SPAWNS, SPAWN_RULES } from "../../server/src/world/spawns";
+import { MAX_SPAWNS, SPAWN_RULES } from "../../game/src/world/spawns";
 import { call, inWorld, newPlayer, rowsWrittenBy } from "./helpers";
 
 /** Spawns and places around the player, in workerd. */

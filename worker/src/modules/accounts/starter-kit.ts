@@ -1,5 +1,5 @@
 import type { GeoEquipmentSlot } from "@geo/shared";
-import { CONTENT, GAME_CONFIG } from "../../../../server/src/content";
+import { CONTENT, GAME_CONFIG } from "../../../../game/src/content";
 import type { Db } from "../../db/db";
 import * as playerRepository from "../player/player.repository";
 import * as wardrobeRepository from "../wardrobe/wardrobe.repository";

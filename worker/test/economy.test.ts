@@ -8,7 +8,7 @@ import {
     type GeoOwnListing,
     type GeoVendorsResponse,
 } from "@geo/shared";
-import { CONTENT, sellValueOf } from "../../server/src/content";
+import { CONTENT, sellValueOf } from "../../game/src/content";
 import { runDueJobs } from "../src/jobs";
 import { dueAt } from "../src/modules/jobs/jobs.repository";
 import { amountOf, call, giveCoins, grant, inWorld, newPlayer, path, rowsWrittenBy } from "./helpers";

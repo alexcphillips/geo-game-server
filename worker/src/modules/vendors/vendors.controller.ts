@@ -1,4 +1,3 @@
-import { randomInt } from "node:crypto";
 import type { Context } from "hono";
 import {
     GEO_VENDOR_MAX_QUANTITY,
@@ -8,11 +7,12 @@ import {
     type GeoVendorSellRequest,
     type GeoVendorsResponse,
 } from "@geo/shared";
-import { CONTENT, npcBuys, reforgesFor, sellValueOf, type VendorDef } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
-import { wholeNumber } from "../../../../server/src/lib/validate";
-import { priceNow, reforgeCostNow, toVendorView } from "../../../../server/src/modules/vendors/geo-vendors.rules";
-import { NEW_PET, petOf, petState, type PetCopy } from "../../../../server/src/pets/pets";
+import { CONTENT, npcBuys, reforgesFor, sellValueOf, type VendorDef } from "../../../../game/src/content";
+import { randomInt } from "../../../../game/src/engine/rng";
+import { AppError } from "../../../../game/src/http/AppError";
+import { wholeNumber } from "../../../../game/src/lib/validate";
+import { priceNow, reforgeCostNow, toVendorView } from "../../../../game/src/modules/vendors/geo-vendors.rules";
+import { NEW_PET, petOf, petState, type PetCopy } from "../../../../game/src/pets/pets";
 import type { AppEnv } from "../../app";
 import { jsonBody } from "../../http/body";
 import { globalModifiers } from "../mayor/mayor.repository";
@@ -20,9 +20,9 @@ import { changeMe } from "../player/player.controller";
 import * as playerRepository from "../player/player.repository";
 
 /**
- * NPC vendors, from server/src/modules/vendors/geo-vendors.controller.ts
- * (whose price rules this uses). Each trade is one transaction that takes
- * first (coins, the item) and hands over after, and replies with the player.
+ * NPC vendors; the prices are game/src/modules/vendors/geo-vendors.rules.ts.
+ * Each trade is one transaction that takes first (coins, the item) and hands
+ * over after, and replies with the player.
  */
 
 type Ctx = Context<AppEnv>;

@@ -22,9 +22,9 @@ import {
     type GeoSaveHandRequest,
     type GeoSetHandRequest,
 } from "@geo/shared";
-import { CONTENT } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
-import { campMovableAt, isAtCamp, roundCamp } from "../../../../server/src/modules/player/geo-camp.rules";
+import { CONTENT } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
+import { campMovableAt, isAtCamp, roundCamp } from "../../../../game/src/modules/player/geo-camp.rules";
 import type { AppEnv } from "../../app";
 import type { Db } from "../../db/db";
 import { requirePlayerId } from "../../http/auth";
@@ -34,7 +34,7 @@ import { syncActiveLoadout } from "../wardrobe/wardrobe.repository";
 import * as playerRepository from "./player.repository";
 
 /**
- * The signed-in player's own state, from server/src/modules/player/geo-player.controller.ts.
+ * The signed-in player's own state.
  * Each change runs in one synchronous transaction and replies with the whole
  * player, read after it commits.
  */

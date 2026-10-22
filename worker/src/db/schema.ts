@@ -53,7 +53,7 @@ const MIGRATIONS: string[][] = [
         `CREATE INDEX refresh_tokens_player ON refresh_tokens (player_id);`,
     ],
 
-    // 2: the rest of the game, translated from server/src/db/geo.schema.ts
+    // 2: the rest of the game, translated
     // (read its comments for what each table means). Left out on purpose:
     // presence (last_seen_at, activity: the socket hub's), player_travel and spawns'
     // out_of_reach_since live in World memory; the Market's refund-on-delete
@@ -530,7 +530,7 @@ const MIGRATIONS: string[][] = [
     // source copy) newest first and stops at the page's 500; an entry costs a
     // write when a single is listed and when it ends.
     //
-    // The refund (from server/src/db/geo.schema.ts): a deleted
+    // The refund (as on Postgres): a deleted
     // player takes their listings with them; other players' coins held by
     // bids on those listings go back to them first, through the ledger,
     // rather than vanishing. Only an admin deletes a player.

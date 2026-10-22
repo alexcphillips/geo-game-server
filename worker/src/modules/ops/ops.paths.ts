@@ -1,6 +1,6 @@
 /**
  * The operator's routes, behind GEO_OPS_SECRET (http/ops.ts). Not part of the
- * app's API (`@geo/shared`): only the scripts in server/src/dev call them.
+ * app's API (`@geo/shared`): only worker/scripts call them.
  */
 export const GEO_OPS_PATHS = {
     /** POST { email, role }: the way to the first admin (`npm run geo:admin`). */
@@ -11,7 +11,7 @@ export const GEO_OPS_PATHS = {
     sql: "/geo/ops/sql",
     /** POST { playerId, items }: items straight into an inventory; the new row ids. Only while GEO_DEV_TOOLS is on. */
     grant: "/geo/ops/grant",
-    // The rest, dev tools only too: what a smoke suite did through the Express server's own functions.
+    // The rest, dev tools only too: what a smoke suite needs beyond the API.
     /** POST { playerId, amount, reason?, reference? }: coins through the ledger (addCoins). */
     coins: "/geo/ops/coins",
     /** POST { playerId, skill, amount }: skill XP, and the active pet's share (addSkillXp). */

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
-import { AppError } from "../../server/src/http/AppError";
+import { AppError } from "../../game/src/http/AppError";
 import type { GeoRole } from "@geo/shared";
 import type { Db } from "./db/db";
 import type { Env } from "./env";

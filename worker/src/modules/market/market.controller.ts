@@ -9,9 +9,9 @@ import {
     type GeoBuyStackRequest,
     type GeoCreateListingRequest,
 } from "@geo/shared";
-import { CONTENT } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
-import { wholeNumber } from "../../../../server/src/lib/validate";
+import { CONTENT } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
+import { wholeNumber } from "../../../../game/src/lib/validate";
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";

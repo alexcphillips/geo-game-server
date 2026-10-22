@@ -1,7 +1,7 @@
 import { GEO_DUNGEON_RECONNECT_SECONDS, type GeoDungeonRunStatus, type GeoDungeonRunView, type GeoRoomStyle } from "@geo/shared";
-import { rollPools, type RolledChest } from "../../../../server/src/combat/combatants";
-import { CONTENT, type DungeonDef } from "../../../../server/src/content";
-import type { DungeonScoreRules } from "../../../../server/src/dungeons/dungeon-map";
+import { rollPools, type RolledChest } from "../../../../game/src/combat/combatants";
+import { CONTENT, type DungeonDef } from "../../../../game/src/content";
+import type { DungeonScoreRules } from "../../../../game/src/dungeons/dungeon-map";
 import {
     holdsUp,
     markDone,
@@ -12,9 +12,9 @@ import {
     type MemberState,
     type PartyMember,
     type PartyState,
-} from "../../../../server/src/dungeons/dungeon-run";
-import { createRng } from "../../../../server/src/engine/rng";
-import { AppError } from "../../../../server/src/http/AppError";
+} from "../../../../game/src/dungeons/dungeon-run";
+import { createRng } from "../../../../game/src/engine/rng";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import * as chestsRepository from "../chests/chests.repository";
@@ -25,9 +25,7 @@ import type { DungeonMemberRecord, DungeonMemberRow, DungeonRunRecord, LoadedRun
 
 /**
  * What the rest of the game needs from dungeon runs without importing the
- * Run code (which imports this), from
- * server/src/modules/dungeon-runs/geo-dungeon-runs.fights.ts: loading and
- * saving a party's run, the in-a-dungeon check, the hook a room fight calls
+ * Run code (which imports this): loading and saving a party's run, the in-a-dungeon check, the hook a room fight calls
  * when it ends, and the view.
  */
 

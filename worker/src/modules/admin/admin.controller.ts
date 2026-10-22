@@ -26,8 +26,8 @@ import {
     type GeoSuggestionKind,
     type GeoSuggestionStatus,
 } from "@geo/shared";
-import { CONTENT } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
+import { CONTENT } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { AppEnv } from "../../app";
 import type { Db } from "../../db/db";
 import { requirePlayerId } from "../../http/auth";
@@ -43,7 +43,7 @@ import * as suggestionsRepository from "../suggestions/suggestions.repository";
 import * as adminRepository from "./admin.repository";
 
 /**
- * Game-admin tools, from server/src/modules/admin/geo-admin.controller.ts.
+ * Game-admin tools.
  * Every route needs a geo admin, and every change is audited in its own
  * transaction.
  */

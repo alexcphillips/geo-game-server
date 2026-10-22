@@ -13,14 +13,14 @@ import {
     type GeoPoint,
     type GeoSavedHand,
 } from "@geo/shared";
-import { CONTENT, GAME_CONFIG } from "../../../../server/src/content";
-import { isStackable } from "../../../../server/src/content/content.types";
-import type { StatModifier } from "../../../../server/src/engine/engine.types";
-import { AppError } from "../../../../server/src/http/AppError";
-import { campMovableAt, currentHealth } from "../../../../server/src/modules/player/geo-camp.rules";
-import { activePetModifierSources, NEW_PET, petOf, petState, petXpFrom, type PetCopy } from "../../../../server/src/pets/pets";
-import { maxHealthFrom, ownModifiersFrom } from "../../../../server/src/world/modifiers";
-import { statSheet } from "../../../../server/src/world/stat-sheet";
+import { CONTENT, GAME_CONFIG } from "../../../../game/src/content";
+import { isStackable } from "../../../../game/src/content/content.types";
+import type { StatModifier } from "../../../../game/src/engine/engine.types";
+import { AppError } from "../../../../game/src/http/AppError";
+import { campMovableAt, currentHealth } from "../../../../game/src/modules/player/geo-camp.rules";
+import { activePetModifierSources, NEW_PET, petOf, petState, petXpFrom, type PetCopy } from "../../../../game/src/pets/pets";
+import { maxHealthFrom, ownModifiersFrom } from "../../../../game/src/world/modifiers";
+import { statSheet } from "../../../../game/src/world/stat-sheet";
 import type { Db } from "../../db/db";
 import { globalModifiers } from "../mayor/mayor.repository";
 import { findWardrobe } from "../wardrobe/wardrobe.repository";
@@ -41,7 +41,7 @@ import type {
 } from "./player.types";
 
 /**
- * The player's own state, from server/src/modules/player/geo-player.repository.ts.
+ * The player's own state.
  * Every function is synchronous: a caller that writes runs it inside one
  * `db.transaction`, which is all the locking the World needs, so there is no
  * `lockPlayer` here.

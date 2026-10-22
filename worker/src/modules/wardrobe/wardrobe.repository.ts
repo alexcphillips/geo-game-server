@@ -8,15 +8,15 @@ import {
     type GeoLoadoutActivity,
     type GeoWardrobe,
 } from "@geo/shared";
-import { CONTENT, GAME_CONFIG } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
+import { CONTENT, GAME_CONFIG } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { Db } from "../../db/db";
 import { CLEAR_ACTIVE_PET, CLEAR_EQUIPMENT, FIND_SKILL_XP, SET_ACTIVE_PET, UNEQUIP_INVENTORY, UPSERT_EQUIPMENT } from "../player/player.sql.ts";
 import type { SkillXpRow } from "../player/player.types";
 import * as sql from "./wardrobe.sql.ts";
 
 /**
- * The wardrobe's storage, from server/src/modules/wardrobe/geo-wardrobe.repository.ts.
+ * The wardrobe's storage.
  * No player-repository import: `findMe` reads the wardrobe from here, and the
  * equipment and pet writes share its SQL. Coins for upgrades are spent by the controller.
  */

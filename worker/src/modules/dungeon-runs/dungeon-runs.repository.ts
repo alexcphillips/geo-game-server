@@ -1,7 +1,7 @@
 import type { GeoDungeonRunResponse, GeoRunResponse } from "@geo/shared";
-import { rollPools, type Drop } from "../../../../server/src/combat/combatants";
-import { CONTENT, type DungeonDef } from "../../../../server/src/content";
-import { rollMap } from "../../../../server/src/dungeons/dungeon-map";
+import { rollPools, type Drop } from "../../../../game/src/combat/combatants";
+import { CONTENT, type DungeonDef } from "../../../../game/src/content";
+import { rollMap } from "../../../../game/src/dungeons/dungeon-map";
 import {
     bossRoomOf,
     holdsUp,
@@ -14,10 +14,10 @@ import {
     newPartyState,
     perspective,
     settleReadyUp,
-} from "../../../../server/src/dungeons/dungeon-run";
-import type { BattleState } from "../../../../server/src/engine/engine.types";
-import { createRng, randomSeed } from "../../../../server/src/engine/rng";
-import { AppError } from "../../../../server/src/http/AppError";
+} from "../../../../game/src/dungeons/dungeon-run";
+import type { BattleState } from "../../../../game/src/engine/engine.types";
+import { createRng, randomSeed } from "../../../../game/src/engine/rng";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { World } from "../../app";
 import { endOpenFishing } from "../fishing/fishing.repository";
 import * as playerRepository from "../player/player.repository";
@@ -38,8 +38,7 @@ import { END_FIGHT, FIND_FIGHT, INSERT_DUNGEON_RUN, INSERT_MEMBER } from "./dung
 import type { DungeonMemberRow, DungeonRunRecord, LoadedRun } from "./dungeon-runs.types";
 
 /**
- * A started dungeon's map, walked room by room by the whole party, from
- * server/src/modules/dungeon-runs/geo-dungeon-runs.repository.ts. Each
+ * A started dungeon's map, walked room by room by the whole party. Each
  * function runs inside the caller's transaction: one party action is one
  * transaction, which is all the locking the party needs.
  */

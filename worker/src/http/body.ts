@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import { AppError } from "../../../server/src/http/AppError";
+import { AppError } from "../../../game/src/http/AppError";
 
 /** The JSON body, or `{}` when there is none. A body that isn't JSON is a 400. */
 export async function jsonBody(c: Context): Promise<Record<string, unknown>> {

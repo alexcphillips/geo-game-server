@@ -1,5 +1,5 @@
 import type { Context, MiddlewareHandler } from "hono";
-import { AppError } from "../../../server/src/http/AppError";
+import { AppError } from "../../../game/src/http/AppError";
 import type { AppEnv } from "../app";
 
 const encoder = new TextEncoder();

@@ -5,16 +5,15 @@
     "type": "module",
     "workspaces": [
         "shared",
-        "server",
+        "game",
         "worker"
     ],
     "scripts": {
-        "dev": "npm run dev --workspace @geo/server",
-        "start": "npm run start --workspace @geo/server",
+        "dev": "npm run dev --workspace @geo/worker",
         "typecheck": "npm run typecheck --workspaces",
         "lint": "eslint .",
-        "test": "npm run test --workspace @geo/server && npm run test --workspace @geo/worker",
-        "check": "npm run data:index --workspace @geo/server -- --check && npm run typecheck && npm run lint && npm test && npm run geo:data --workspace @geo/server",
+        "test": "npm run test --workspace @geo/game && npm run test --workspace @geo/worker",
+        "check": "npm run data:index --workspace @geo/game -- --check && npm run typecheck && npm run lint && npm test && npm run geo:data --workspace @geo/game",
         "dev:worker": "npm run dev --workspace @geo/worker",
         "deploy:worker": "npm run deploy --workspace @geo/worker"
     },

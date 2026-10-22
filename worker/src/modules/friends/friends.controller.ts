@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import { GEO_ACTIVITIES, type GeoActivity, type GeoPresenceRequest, type GeoSendFriendRequest } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { AppEnv, World } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";

@@ -1,5 +1,5 @@
 import { distanceMetres, type GeoAdminPlace, type GeoPlace, type GeoPlaceKind, type GeoPlaceSettings, type GeoPoint } from "@geo/shared";
-import type { NewPlace, PlaceChanges } from "../../../../server/src/modules/places/geo-places.types";
+import type { NewPlace, PlaceChanges } from "../../../../game/src/modules/places/geo-places.types";
 import type { Db } from "../../db/db";
 import {
     DELETE_PLACE,

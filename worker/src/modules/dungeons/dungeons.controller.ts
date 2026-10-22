@@ -1,13 +1,13 @@
 import type { Context } from "hono";
 import { distanceMetres, GEO_PLACE_REACH_METRES, isValidPoint, type GeoCreateDungeonLobbyRequest, type GeoDungeonEntrance } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
-import { isUuid } from "../../../../server/src/lib/validate";
+import { AppError } from "../../../../game/src/http/AppError";
+import { isUuid } from "../../../../game/src/lib/validate";
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";
 import * as dungeonsRepository from "./dungeons.repository";
 
-/** Dungeon lobbies, from server/src/modules/dungeons/geo-dungeons.controller.ts. Each request is one transaction. */
+/** Dungeon lobbies. Each request is one transaction. */
 
 type Ctx = Context<AppEnv>;
 

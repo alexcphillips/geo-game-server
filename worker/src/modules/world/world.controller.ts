@@ -10,10 +10,10 @@ import {
     type GeoWorldResponse,
     type GeoWorldWaterKind,
 } from "@geo/shared";
-import { CONTENT } from "../../../../server/src/content";
-import { createRng } from "../../../../server/src/engine/rng";
-import { AppError } from "../../../../server/src/http/AppError";
-import { rollSpawnCount, SPAWN_RULES, windowAt, type NearPlaces } from "../../../../server/src/world/spawns";
+import { CONTENT } from "../../../../game/src/content";
+import { createRng } from "../../../../game/src/engine/rng";
+import { AppError } from "../../../../game/src/http/AppError";
+import { rollSpawnCount, SPAWN_RULES, windowAt, type NearPlaces } from "../../../../game/src/world/spawns";
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";
@@ -23,8 +23,7 @@ import { findPlacesNear } from "../places/places.repository";
 import * as worldRepository from "./world.repository";
 
 /**
- * Enemies around the player, placed for them alone, from
- * server/src/modules/world/geo-world.controller.ts.
+ * Enemies around the player, placed for them alone.
  */
 
 type Ctx = Context<AppEnv>;

@@ -1,12 +1,12 @@
 import type { Context } from "hono";
 import { GEO_FARM_ACTION_TYPES, type GeoFarmAction } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";
 import * as farmingRepository from "./farming.repository";
 
-/** The farm, from server/src/modules/farming/geo-farming.controller.ts. Each request is one transaction. */
+/** The farm. Each request is one transaction. */
 
 type Ctx = Context<AppEnv>;
 

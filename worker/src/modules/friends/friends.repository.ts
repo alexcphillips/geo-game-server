@@ -7,7 +7,7 @@ import {
     type GeoFriendsResponse,
     type GeoSendFriendResponse,
 } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import { countPending } from "../chests/chests.repository";
@@ -28,7 +28,7 @@ import {
 import type { ChangedPairRecord, FriendRecord, PairRecord, RequestRecord } from "./friends.types";
 
 /**
- * Friends and requests, from server/src/modules/friends/geo-friends.repository.ts.
+ * Friends and requests.
  * Presence is the socket hub's, not rows: online while they have a socket
  * open (or within its grace), doing what their app last reported.
  */

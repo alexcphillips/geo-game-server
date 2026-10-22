@@ -1,13 +1,13 @@
 import type { Context } from "hono";
 import type { GeoDungeonMoveRequest, GeoDungeonPuzzleRequest } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
-import { isUuid } from "../../../../server/src/lib/validate";
+import { AppError } from "../../../../game/src/http/AppError";
+import { isUuid } from "../../../../game/src/lib/validate";
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";
 import * as dungeonRunsRepository from "./dungeon-runs.repository";
 
-/** A started dungeon's map, from server/src/modules/dungeon-runs/geo-dungeon-runs.controller.ts. Each request is one transaction. */
+/** A started dungeon's map. Each request is one transaction. */
 
 type Ctx = Context<AppEnv>;
 

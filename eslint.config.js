@@ -3,7 +3,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
 
-/** One config for every workspace: Node globals for `server/`, Worker globals for `worker/`, none for `shared/` (which the app also uses). */
+/** One config for every workspace: Node globals for `game/` and `worker/scripts/`, Worker globals for the rest of `worker/`, none for `shared/` (which the app also uses). */
 export default defineConfig([
     globalIgnores(["**/dist", "**/node_modules"]),
 
@@ -17,12 +17,12 @@ export default defineConfig([
     },
 
     {
-        files: ["server/**/*.ts"],
-        languageOptions: { globals: globals.node },
+        files: ["worker/**/*.ts"],
+        languageOptions: { globals: globals.serviceworker },
     },
 
     {
-        files: ["worker/**/*.ts"],
-        languageOptions: { globals: globals.serviceworker },
+        files: ["game/**/*.ts", "worker/scripts/**/*.ts"],
+        languageOptions: { globals: globals.node },
     },
 ]);

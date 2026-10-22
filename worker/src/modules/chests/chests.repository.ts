@@ -1,13 +1,13 @@
 import type { GeoChestSelection, GeoChestSource, GeoChestsResponse } from "@geo/shared";
-import type { RolledChest } from "../../../../server/src/combat/combatants";
-import { AppError } from "../../../../server/src/http/AppError";
+import type { RolledChest } from "../../../../game/src/combat/combatants";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import * as playerRepository from "../player/player.repository";
 import { COUNT_PENDING, FIND_HISTORY, FIND_PENDING, FIND_SELECTION, INSERT_SELECTION, MARK_OPENED } from "./chests.sql.ts";
 import type { ChestSelectionRecord } from "./chests.types";
 
-/** Chests won and waiting to be opened, from server/src/modules/chests/geo-chests.repository.ts. */
+/** Chests won and waiting to be opened. */
 
 const iso = (ms: number) => new Date(ms).toISOString();
 

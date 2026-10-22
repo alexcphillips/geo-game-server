@@ -1,4 +1,4 @@
-// The player's own state, from server/src/modules/player/geo-player.sql.ts.
+// The player's own state.
 // Differences from Postgres: no FOR UPDATE (the World runs one request at a
 // time), `= ANY($1)` is `IN (SELECT value FROM json_each(?))` with a JSON
 // array, times are ms passed in, and JSON columns are TEXT.

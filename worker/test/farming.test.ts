@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { GEO_API_PATHS, type GeoFarmAction, type GeoFarmView } from "@geo/shared";
-import { FARMING } from "../../server/src/content";
-import { weekEndsAt, weekOf } from "../../server/src/farming/farm";
+import { FARMING } from "../../game/src/content";
+import { weekEndsAt, weekOf } from "../../game/src/farming/farm";
 import { runDueJobs } from "../src/jobs";
 import { dueAt, schedule } from "../src/modules/jobs/jobs.repository";
 import { addCoins } from "../src/modules/player/player.repository";

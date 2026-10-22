@@ -1,6 +1,6 @@
 import { GEO_FARM_CONTESTS, type GeoFarmContestId, type GeoFarmContests, type GeoGlobalFarmEvent } from "@geo/shared";
-import { CONTENT, FARMING } from "../../../../server/src/content";
-import { contestCropFor, globalEventFor, weekEndsAt, weekOf, type FarmStepResult } from "../../../../server/src/farming/farm";
+import { CONTENT, FARMING } from "../../../../game/src/content";
+import { contestCropFor, globalEventFor, weekEndsAt, weekOf, type FarmStepResult } from "../../../../game/src/farming/farm";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import { insertAnnouncement, insertMessage } from "../inbox/inbox.repository";
@@ -8,8 +8,7 @@ import * as playerRepository from "../player/player.repository";
 import { ADD_CONTEST_SCORE, BEST_CONTEST_SCORE, CLAIM_ANNOUNCE, CLAIM_SETTLE, CONTEST_STANDINGS, RANK_CONTEST, UNSETTLED_WEEKS } from "./farming.sql.ts";
 
 /**
- * The weekly farm contests and server-wide events, from
- * server/src/modules/farming/geo-farming.contests.ts. Weeks run Monday to
+ * The weekly farm contests and server-wide events. Weeks run Monday to
  * Monday UTC (`weekOf`). Harvests add to the week's scores as they happen;
  * the scheduler's `farm-weeks` job (src/jobs.ts) pays each finished week
  * once, mails every entrant their placings, and posts the new week's

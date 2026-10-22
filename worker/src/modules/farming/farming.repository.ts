@@ -1,9 +1,9 @@
 import type { GeoFarmAction, GeoFarmView, GeoResearchRequest } from "@geo/shared";
-import { CONTENT, FARMING } from "../../../../server/src/content";
-import { isFarmingCardId } from "../../../../server/src/content/farming";
-import { FARMING_FORTUNE_STAT, MUTATION_CHANCE_STAT, PEST_CHANCE_STAT } from "../../../../server/src/engine/engine.types";
-import { randomSeed } from "../../../../server/src/engine/rng";
-import { applyModifiers } from "../../../../server/src/engine/stats";
+import { CONTENT, FARMING } from "../../../../game/src/content";
+import { isFarmingCardId } from "../../../../game/src/content/farming";
+import { FARMING_FORTUNE_STAT, MUTATION_CHANCE_STAT, PEST_CHANCE_STAT } from "../../../../game/src/engine/engine.types";
+import { randomSeed } from "../../../../game/src/engine/rng";
+import { applyModifiers } from "../../../../game/src/engine/stats";
 import {
     activeGlobalEvent,
     catchUp,
@@ -18,9 +18,9 @@ import {
     type FarmState,
     type StoredFarm,
     type WeatherLookup,
-} from "../../../../server/src/farming/farm";
-import { AppError } from "../../../../server/src/http/AppError";
-import { toFarmView, type FarmReport } from "../../../../server/src/modules/farming/geo-farming.view";
+} from "../../../../game/src/farming/farm";
+import { AppError } from "../../../../game/src/http/AppError";
+import { toFarmView, type FarmReport } from "../../../../game/src/modules/farming/geo-farming.view";
 import type { Db } from "../../db/db";
 import * as playerRepository from "../player/player.repository";
 import type { InventoryRow } from "../player/player.types";
@@ -28,9 +28,8 @@ import { findContests, findGlobalEvent, recordHarvests } from "./farming.contest
 import { FIND_FARM, INSERT_FARM, UPDATE_FARM } from "./farming.sql.ts";
 
 /**
- * The farm, from server/src/modules/farming/geo-farming.repository.ts. A
- * farm's whole grid is one JSON row; each function runs inside the caller's
- * transaction.
+ * The farm. A farm's whole grid is one JSON row; each function runs inside
+ * the caller's transaction.
  */
 
 /** How many of each item the player holds, for the Research Lab and structures. */

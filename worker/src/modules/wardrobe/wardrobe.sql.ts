@@ -1,6 +1,6 @@
-// From server/src/modules/wardrobe/geo-wardrobe.sql.ts. Postgres's
-// CTE-wrapped writes are split into one statement each (the caller's
-// transaction holds them together); jsonb_object_agg is json_group_object.
+// Postgres's CTE-wrapped writes are split into one statement each (the
+// caller's transaction holds them together); jsonb_object_agg is
+// json_group_object.
 
 export const FIND_WARDROBE_STATE = `SELECT wardrobe_bought, active_loadout FROM players WHERE id = ?;`;
 

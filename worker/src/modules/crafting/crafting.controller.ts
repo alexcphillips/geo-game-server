@@ -1,8 +1,8 @@
 import type { Context } from "hono";
 import { GEO_CRAFT_MAX_QUANTITY, geoSkillName, geoUnmetSkill, type GeoCraftRequest } from "@geo/shared";
-import { CONTENT } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
-import { wholeNumber } from "../../../../server/src/lib/validate";
+import { CONTENT } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
+import { wholeNumber } from "../../../../game/src/lib/validate";
 import type { AppEnv } from "../../app";
 import { jsonBody } from "../../http/body";
 import { changeMe } from "../player/player.controller";

@@ -19,7 +19,7 @@ import {
 } from "./admin.sql.ts";
 import type { AdminPlayerRecord, AuditRecord, LedgerRecord } from "./admin.types";
 
-/** Game-admin reads and writes, from server/src/modules/admin/geo-admin.repository.ts. */
+/** Game-admin reads and writes. */
 
 const iso = (ms: number) => new Date(ms).toISOString();
 

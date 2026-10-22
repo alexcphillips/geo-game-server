@@ -1,4 +1,4 @@
-import type { Travel } from "../../../../server/src/world/travel";
+import type { Travel } from "../../../../game/src/world/travel";
 
 export type SpawnRow = {
     id: string;

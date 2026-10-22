@@ -1,5 +1,5 @@
 import type { GeoAdminSuggestion, GeoSuggestionKind, GeoSuggestionStatus } from "@geo/shared";
-import type { NewSuggestion } from "../../../../server/src/modules/suggestions/geo-suggestions.types";
+import type { NewSuggestion } from "../../../../game/src/modules/suggestions/geo-suggestions.types";
 import type { Db } from "../../db/db";
 import {
     ACCEPT_FOR_PLACE,
@@ -13,7 +13,7 @@ import {
 } from "./suggestions.sql.ts";
 import type { SuggestionRecord } from "./suggestions.types";
 
-/** Places players suggest, and their review, from server/src/modules/suggestions/geo-suggestions.repository.ts. */
+/** Places players suggest, and their review. */
 
 const iso = (ms: number) => new Date(ms).toISOString();
 

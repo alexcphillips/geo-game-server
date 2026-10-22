@@ -1,9 +1,9 @@
 import type { GeoCombatantView, GeoHandCard, GeoLunchboxSlot, GeoRunView } from "@geo/shared";
-import { PLAYER_COMBATANT_ID } from "../../../../server/src/combat/combatants";
-import { CONTENT } from "../../../../server/src/content";
-import { canPlayCard, currentActor, previewCard, previewIntent } from "../../../../server/src/engine/battle";
-import { CORE_STATS } from "../../../../server/src/engine/engine.types";
-import { statOf } from "../../../../server/src/engine/stats";
+import { PLAYER_COMBATANT_ID } from "../../../../game/src/combat/combatants";
+import { CONTENT } from "../../../../game/src/content";
+import { canPlayCard, currentActor, previewCard, previewIntent } from "../../../../game/src/engine/battle";
+import { CORE_STATS } from "../../../../game/src/engine/engine.types";
+import { statOf } from "../../../../game/src/engine/stats";
 import type { RunRow } from "./runs.types";
 
 /** Card id → the item that plays it, for the app's name and icon. */
@@ -12,10 +12,9 @@ const ITEM_FOR_CARD = new Map(
 );
 
 /**
- * A Run as its player sees it, from server/src/modules/runs/geo-runs.view.ts:
- * health, statuses, their own hand. Enemy rules and the RNG stay on the
- * server. In a shared fight the other players show as combatants on your
- * side, and the turn clock comes along.
+ * A Run as its player sees it: health, statuses, their own hand. Enemy
+ * rules and the RNG stay on the server. In a shared fight the other players
+ * show as combatants on your side, and the turn clock comes along.
  */
 export function toRunView(row: RunRow, now = Date.now()): GeoRunView {
     const { state } = row;

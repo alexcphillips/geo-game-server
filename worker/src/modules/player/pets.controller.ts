@@ -1,8 +1,8 @@
 import type { Context } from "hono";
 import type { GeoPetItemRequest, GeoSetActivePetRequest } from "@geo/shared";
-import { CONTENT, GAME_CONFIG } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
-import { petOf } from "../../../../server/src/pets/pets";
+import { CONTENT, GAME_CONFIG } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
+import { petOf } from "../../../../game/src/pets/pets";
 import type { AppEnv } from "../../app";
 import type { Db } from "../../db/db";
 import { jsonBody } from "../../http/body";
@@ -12,8 +12,7 @@ import * as playerRepository from "./player.repository";
 import type { InventoryRow } from "./player.types";
 
 /**
- * The player's pets: which one is active, and what each holds, from
- * server/src/modules/player/geo-pets.controller.ts. Kat's rarity upgrades
+ * The player's pets: which one is active, and what each holds. Kat's rarity upgrades
  * are a vendor's (modules/vendors).
  */
 

@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { distanceMetres, isValidPoint, type GeoStartRunRequest } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
-import { SPAWN_RULES } from "../../../../server/src/world/spawns";
+import { AppError } from "../../../../game/src/http/AppError";
+import { SPAWN_RULES } from "../../../../game/src/world/spawns";
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";
@@ -10,7 +10,7 @@ import * as worldRepository from "../world/world.repository";
 import * as runsRepository from "./runs.repository";
 import type { TurnPlay } from "./runs.repository";
 
-/** Fights, from server/src/modules/runs/geo-runs.controller.ts. Each request is one transaction. */
+/** Fights. Each request is one transaction. */
 
 type Ctx = Context<AppEnv>;
 

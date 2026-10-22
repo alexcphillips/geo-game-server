@@ -7,8 +7,8 @@ import { advanceElections } from "./modules/mayor/mayor.repository";
 import { settleBattleClock } from "./modules/runs/runs.repository";
 
 /**
- * The World's clock, replacing server/src/jobs.ts (a 15 s tick) and
- * lib/wake.ts (in-process timers): work booked in the `due` table by key,
+ * The World's clock, replacing the Express server's 15 s tick and
+ * in-process timers: work booked in the `due` table by key,
  * run when the World's alarm goes off (world.ts keeps it at the soonest
  * row). Each key runs in its own transaction, which first takes its row off
  * the table; what it runs books its next time itself.

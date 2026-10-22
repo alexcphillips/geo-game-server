@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import { GEO_PLACES_RADIUS_METRES, isValidPoint, type GeoPlacesResponse } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { AppEnv } from "../../app";
 import * as placesRepository from "./places.repository";
 

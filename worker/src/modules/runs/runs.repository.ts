@@ -15,8 +15,8 @@ import {
     rollLoot,
     type Drop,
     type RolledChest,
-} from "../../../../server/src/combat/combatants";
-import { CONTENT } from "../../../../server/src/content";
+} from "../../../../game/src/combat/combatants";
+import { CONTENT } from "../../../../game/src/content";
 import {
     BattleRuleError,
     canWield,
@@ -29,7 +29,7 @@ import {
     skipTurn,
     type BattleResult,
     type CombatantSetup,
-} from "../../../../server/src/engine/battle";
+} from "../../../../game/src/engine/battle";
 import {
     CORE_STATS,
     MAGIC_FIND_STAT,
@@ -38,12 +38,12 @@ import {
     type LogEntry,
     type LunchboxSlot,
     type StatModifier,
-} from "../../../../server/src/engine/engine.types";
-import { createRng, randomSeed } from "../../../../server/src/engine/rng";
-import { applyModifiers, statOf } from "../../../../server/src/engine/stats";
-import { AppError } from "../../../../server/src/http/AppError";
-import { defeatHealth } from "../../../../server/src/modules/player/geo-camp.rules";
-import { activePetModifiers } from "../../../../server/src/pets/pets";
+} from "../../../../game/src/engine/engine.types";
+import { createRng, randomSeed } from "../../../../game/src/engine/rng";
+import { applyModifiers, statOf } from "../../../../game/src/engine/stats";
+import { AppError } from "../../../../game/src/http/AppError";
+import { defeatHealth } from "../../../../game/src/modules/player/geo-camp.rules";
+import { activePetModifiers } from "../../../../game/src/pets/pets";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import * as chestsRepository from "../chests/chests.repository";
@@ -70,7 +70,7 @@ import type { RunRecord, RunRow } from "./runs.types";
 import { toRunView } from "./runs.view";
 
 /**
- * Combat Runs, from server/src/modules/runs/geo-runs.repository.ts. Every
+ * Combat Runs. Every
  * function is synchronous and runs inside the caller's `db.transaction`,
  * which is all the locking a fight needs: no player locks, no lock order.
  * A shared fight's turn clock is a `due` row (`battle:<id>`) the World's

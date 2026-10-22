@@ -1,6 +1,6 @@
 import { GEO_MAIL_TITLE_MAX, type GeoAdminFeedback, type GeoFeedbackStatus, type GeoMyFeedback } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
-import type { NewFeedback } from "../../../../server/src/modules/feedback/geo-feedback.types";
+import { AppError } from "../../../../game/src/http/AppError";
+import type { NewFeedback } from "../../../../game/src/modules/feedback/geo-feedback.types";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import { insertMessage } from "../inbox/inbox.repository";
@@ -17,7 +17,7 @@ import {
 } from "./feedback.sql.ts";
 import type { FeedbackRecord, MyFeedbackRecord } from "./feedback.types";
 
-/** Players' feedback and the admin's triage, from server/src/modules/feedback/geo-feedback.repository.ts. */
+/** Players' feedback and the admin's triage. */
 
 const iso = (ms: number) => new Date(ms).toISOString();
 

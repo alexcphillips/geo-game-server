@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import type { GeoRole } from "@geo/shared";
-import { CONTENT } from "../../../../server/src/content";
-import { AppError } from "../../../../server/src/http/AppError";
+import { CONTENT } from "../../../../game/src/content";
+import { AppError } from "../../../../game/src/http/AppError";
 import type { AppEnv } from "../../app";
 import type { SqlValue } from "../../db/db";
 import { jsonBody } from "../../http/body";
@@ -14,7 +14,7 @@ import { addCoins, addSkillXp, grantItems, ownModifiers, type CoinReason, type I
 import { recordQuestEvents } from "../quests/quests.repository";
 import { DELETE_PROGRESS_JOBS, PROGRESS_TABLES, RESET_PLAYERS } from "./ops.sql.ts";
 
-/** The operator's tools (GEO_OPS_PATHS), replacing scripts that reached into Postgres. */
+/** The operator's tools (GEO_OPS_PATHS), for worker/scripts. */
 
 type Ctx = Context<AppEnv>;
 

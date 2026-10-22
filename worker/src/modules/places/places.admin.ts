@@ -14,8 +14,8 @@ import {
     type GeoPlaceKind,
     type GeoPlaceSettings,
 } from "@geo/shared";
-import { AppError } from "../../../../server/src/http/AppError";
-import type { PlaceChanges } from "../../../../server/src/modules/places/geo-places.types";
+import { AppError } from "../../../../game/src/http/AppError";
+import type { PlaceChanges } from "../../../../game/src/modules/places/geo-places.types";
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";
@@ -24,8 +24,7 @@ import { acceptForPlace } from "../suggestions/suggestions.repository";
 import * as placesRepository from "./places.repository";
 
 /**
- * Admins making, editing and removing places, every change audited. From
- * server/src/modules/places/geo-places.controller.ts.
+ * Admins making, editing and removing places, every change audited.
  */
 
 type Ctx = Context<AppEnv>;
