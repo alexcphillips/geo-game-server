@@ -90,18 +90,20 @@ stat sheet, modifier maths in `world/modifiers.ts`) is imported from
   whole ms) throws, where Postgres rounded. JSON columns are TEXT, a list of
   ids goes in as a JSON array and is read with `json_each(?)`.
 - **Dev routes** (`/geo/dev/*`, `?fill=true`) answer only while
-  `GEO_DEV_TOOLS` is `"true"` (wrangler.jsonc); turn it off at cutover.
+  `GEO_DEV_TOOLS` is `"true"`: off in wrangler.jsonc (workers.dev), on in
+  `.dev.vars` (wrangler dev) and the tests.
 - **Operator routes** (`/geo/ops/*`, `modules/ops/ops.paths.ts`) answer only
   with `Authorization: Bearer <GEO_OPS_SECRET>` (404 otherwise). The dev
   scripts reach them with `--url <base>` and GEO_OPS_SECRET in the root
   `.env`: `npm run geo:admin -- you@example.com --url …`, `npm run wipe:geo
-  -- --url … [--yes]`, and any smoke suite (`-- --url …`; without it, the
+  -- --url … [--yes]`, and any smoke suite (`-- --url …` only where dev tools are on; without it, the
   suites use `npm run dev:worker` at localhost:8787). The dev routes the
   suites use (SQL, grants, coins, XP, quest events, modifiers, farm weeks,
   due jobs, the spawn clock) also need `GEO_DEV_TOOLS`, and the kit's calls
   skip the rate limits by sending the secret in `X-Geo-Ops`.
-- **Resetting the deployed database** (only until the game moves here): change
-  `WORLD_NAME` in `wrangler.jsonc` and deploy; the new name starts empty.
+- **Resetting the deployed database**: change `WORLD_NAME` in `wrangler.jsonc`
+  and deploy; the new name starts empty (accounts too). Old Worlds are left
+  behind unused.
 
 ## Commands
 

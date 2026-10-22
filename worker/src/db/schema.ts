@@ -5,9 +5,9 @@ import type { Db } from "./db";
  * World object starts (`schema_migrations` remembers which ran). Add a step;
  * never edit one that has run on the deployed World.
  *
- * Until the game moves here, the deployed World holds only test accounts, so
- * a step can still be edited: change `WORLD_NAME` in wrangler.jsonc and the
- * next deploy starts from an empty database.
+ * Editing a step that has run means a fresh start: change `WORLD_NAME` in
+ * wrangler.jsonc and the next deploy starts from an empty database (accounts
+ * too), which is fine while a wipe is.
  *
  * Writes are the free plan's tightest limit (100k rows a day, and every index
  * entry counts), so each index below says which query needs it.

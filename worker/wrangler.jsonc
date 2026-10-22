@@ -14,10 +14,11 @@
     "migrations": [{ "tag": "v1", "new_sqlite_classes": ["World"] }],
     "vars": {
         // Which World object serves the game. Changing it starts an empty
-        // database: how the schema is reset while nobody plays here yet.
-        "WORLD_NAME": "world-1",
-        // The testing routes (/geo/dev/*). Only while nobody plays here: turn off at cutover.
-        "GEO_DEV_TOOLS": "true"
+        // database (a fresh start: progress and accounts are not carried over).
+        "WORLD_NAME": "world-2",
+        // The testing routes (/geo/dev/*, dev-only /geo/ops/*). Off where people play;
+        // on locally through .dev.vars and in the tests (vitest.config.ts).
+        "GEO_DEV_TOOLS": "false"
     }
     // Secret, set with `wrangler secret put GEO_JWT_SECRET` (and in .dev.vars locally).
 }
