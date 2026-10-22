@@ -1,0 +1,21 @@
+{
+    // geo-game on Cloudflare: one Worker in front of one World Durable Object
+    // that holds the game's SQLite database. See src/index.ts.
+    "$schema": "../node_modules/wrangler/config-schema.json",
+    "name": "geo-game",
+    "main": "src/index.ts",
+    "compatibility_date": "2026-10-01",
+    "compatibility_flags": ["nodejs_compat"],
+    "workers_dev": true,
+    "observability": { "enabled": true },
+    "durable_objects": {
+        "bindings": [{ "name": "WORLD", "class_name": "World" }]
+    },
+    "migrations": [{ "tag": "v1", "new_sqlite_classes": ["World"] }],
+    "vars": {
+        // Which World object serves the game. Changing it starts an empty
+        // database: how the schema is reset while nobody plays here yet.
+        "WORLD_NAME": "world-1"
+    }
+    // Secret, set with `wrangler secret put GEO_JWT_SECRET` (and in .dev.vars locally).
+}

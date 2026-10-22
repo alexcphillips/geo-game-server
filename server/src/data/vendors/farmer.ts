@@ -1,0 +1,32 @@
+import type { Vendor } from "#geo/models";
+
+export default {
+    id: "farmer",
+    name: "Farmer",
+    icon: "farmer",
+    description: "Sells seeds and a few tricks of the trade.",
+    sells: [
+        { itemId: "wheat-seeds", price: 2 },
+        { itemId: "carrot-seeds", price: 3 },
+        { itemId: "seed-potato", price: 4 },
+        { itemId: "corn-seeds", price: 5 },
+        { itemId: "pumpkin-seeds", price: 8 },
+        { itemId: "melon-seeds", price: 12 },
+        { itemId: "wheat", price: 5 },
+        { itemId: "card.farm.swat", price: 30 },
+        { itemId: "card.farm.careful-pick", price: 40 },
+        { itemId: "card.farm.read-sky", price: 40 },
+        { itemId: "card.farm.scythe-sweep", price: 150 },
+        { itemId: "card.farm.ripen", price: 150 },
+        { itemId: "card.farm.hold", price: 120 },
+        { itemId: "card.farm.smoke", price: 120 },
+        { itemId: "card.farm.bait-ring", price: 60 },
+        { itemId: "card.farm.snap-trap", price: 80 },
+        { itemId: "card.farm.hand-pollinate", price: 150 },
+        { itemId: "card.farm.hazmat-scrub", price: 60 },
+        { itemId: "card.farm.coax", price: 200 },
+        { itemId: "card.farm.moon-rite", price: 300 },
+        { itemId: "card.farm.controlled-leak", price: 250 },
+        { itemId: "card.farm.tear-the-veil", price: 400 },
+    ],
+} satisfies Vendor;
