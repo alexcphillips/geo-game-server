@@ -33,3 +33,8 @@ export const MARK_OPENED = `
   WHERE id = ? AND opened_at IS NULL
   RETURNING ${SELECTION_COLUMNS};
 `;
+
+/** Chests waiting to be opened: the HUD's badge. */
+export const COUNT_PENDING = `
+  SELECT count(*) AS count FROM chest_selections WHERE player_id = ? AND opened_at IS NULL;
+`;

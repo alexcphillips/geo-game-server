@@ -27,7 +27,7 @@ export class World extends DurableObject<Env> {
     constructor(ctx: DurableObjectState, env: Env) {
         super(ctx, env);
         this.db = new Db(ctx.storage);
-        this.state = { db: this.db, env, lastHeard: new Map(), travel: new Map(), hub: createHub() };
+        this.state = { db: this.db, env, lastHeard: new Map(), presence: new Map(), travel: new Map(), hub: createHub() };
         this.app = createApp(this.state);
         // Nothing is served until the schema is current and the clock is set.
         void ctx.blockConcurrencyWhile(async () => {

@@ -1,4 +1,4 @@
-import type { GeoSocketServerMessage } from "@geo/shared";
+import type { GeoSocketServerMessage, GeoSocketTopic } from "@geo/shared";
 
 /**
  * Who's connected, and pushes to them: server/src/realtime/geo-socket-hub.ts
@@ -19,6 +19,8 @@ export type Hub = {
     publish(playerId: string, message: GeoSocketServerMessage): void;
     /** The HUD's badge counts changed for these players (or everyone): fresh counts go out. */
     badgesChanged(playerIds: string[] | "everyone"): void;
+    /** Something shared changed (the Market, the election): every open screen of it reads again. */
+    broadcastChanged(topic: GeoSocketTopic): void;
 };
 
 export function createHub(): Hub {
@@ -27,5 +29,6 @@ export function createHub(): Hub {
         isConnected: () => false,
         publish: () => {},
         badgesChanged: () => {},
+        broadcastChanged: () => {},
     };
 }

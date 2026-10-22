@@ -10,25 +10,38 @@ import { withTransaction } from "../db/transaction";
 import { geoRouter } from "../geo.routes";
 import { attachGeoSocket } from "../realtime/geo-socket";
 import { grantItems } from "../modules/player/geo-player.repository";
+import { GEO_OPS_PATHS, ops, workerSql, workerUrl } from "./ops-client";
 
 /**
  * What every smoke test needs: the geo router on a spare port, a typed call,
  * throwaway accounts, and their clean-up. Smoke tests are dev only — they
  * make real (if short-lived) geo-game accounts.
+ *
+ * With `--url <base>` they run against the Cloudflare Worker there instead
+ * (`npm run dev:worker`, or workers.dev while its dev tools are on): grants
+ * and clean-up go through its operator routes (GEO_OPS_SECRET), and `sql`
+ * runs SQLite on its World. A suite's own Postgres queries (`pool`) don't
+ * reach the Worker yet; moving them to `sql` is session 5's.
  */
 if (IS_PRODUCTION) throw new Error("geo smoke tests refuse to run in production");
 
-export async function startSmokeServer() {
+/** The Express server on a spare port, for a run without `--url`. */
+async function startExpress() {
     const app = express();
     app.use(express.json());
     app.use(geoRouter);
     app.use(notFoundHandler);
     app.use(errorHandler);
-
     await ensureGeoSchema();
     const server = app.listen(0);
     attachGeoSocket(server);
-    const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    return server;
+}
+
+export async function startSmokeServer() {
+    const worker = workerUrl();
+    const server = worker ? null : await startExpress();
+    const base = worker ?? `http://127.0.0.1:${(server!.address() as AddressInfo).port}`;
     const emails: string[] = [];
     const sockets: WebSocket[] = [];
 
@@ -62,7 +75,14 @@ export async function startSmokeServer() {
 
     /** Puts items straight into a player's inventory, for a test that needs more than the starter kit. */
     async function grant(playerId: string, items: { itemId: string; quantity: number; chargesLeft?: number }[]) {
+        if (worker) return (await ops<{ ids: string[] }>(worker, GEO_OPS_PATHS.grant, { playerId, items })).ids;
         return withTransaction((tx) => grantItems(tx, playerId, items));
+    }
+
+    /** One SQLite statement on the Worker's World (with `--url` only): its rows. */
+    async function sql<Row>(text: string, params: unknown[] = []): Promise<Row[]> {
+        if (!worker) throw new Error("sql() is for --url runs; use pool against Postgres");
+        return workerSql<Row>(worker, text, params);
     }
 
     /**
@@ -101,14 +121,17 @@ export async function startSmokeServer() {
     /** Deletes the throwaway players, then shuts down. */
     async function stop() {
         for (const ws of sockets) ws.close();
-        server.close();
+        server?.close();
         // One at a time: deleting a seller refunds their bidders (a trigger),
         // which Postgres refuses when a bidder is deleted by the same statement.
-        for (const email of emails) await pool.query(`DELETE FROM geo.players WHERE email = $1`, [email]);
+        for (const email of emails) {
+            if (worker) await workerSql(worker, `DELETE FROM players WHERE email = ?`, [email]);
+            else await pool.query(`DELETE FROM geo.players WHERE email = $1`, [email]);
+        }
         await pool.end();
     }
 
-    return { call, registerPlayer, grant, openSocket, stop };
+    return { call, registerPlayer, grant, sql, openSocket, stop, worker };
 }
 
 export const step = (name: string) => console.log(`✓ ${name}`);

@@ -2,6 +2,8 @@ import type { World } from "./app";
 import { settleRun } from "./modules/dungeon-runs/dungeon-runs.repository";
 import { settleFarmWeeks } from "./modules/farming/farming.contests";
 import { deleteOldRefreshTokens, findDue, schedule, scheduleOnce } from "./modules/jobs/jobs.repository";
+import { settleAuction } from "./modules/market/market.repository";
+import { advanceElections } from "./modules/mayor/mayor.repository";
 import { settleBattleClock } from "./modules/runs/runs.repository";
 
 /**
@@ -28,6 +30,8 @@ type Job = (world: World, id: string, now: number) => void;
 const JOBS: Record<string, Job> = {
     battle: (world, battleId, now) => settleBattleClock(world, battleId, now),
     dungeon: (world, dungeonRunId, now) => settleRun(world, dungeonRunId, now),
+    /** An auction's end: the winner gets the item, or it goes back to the seller. */
+    auction: (world, listingId, now) => void settleAuction(world, listingId, now),
     /** Refresh tokens long past use, once a day. */
     cleanup: (world, _id, now) => {
         deleteOldRefreshTokens(world.db, now);
@@ -35,12 +39,15 @@ const JOBS: Record<string, Job> = {
     },
     /** Pays out finished farm weeks and announces the new one, each Monday 00:00 UTC. */
     "farm-weeks": (world, _id, now) => schedule(world.db, "farm-weeks", settleFarmWeeks(world, now)),
+    /** Closes the week's election (its winner takes office) and opens the next, booked for its end. */
+    election: (world, _id, now) => schedule(world.db, "election", advanceElections(world, now).ends_at),
 };
 
 /** Books the jobs that always come back, unless they're booked already. Run when the World starts. */
 export function bookRecurringJobs(world: World, now = Date.now()) {
     scheduleOnce(world.db, "cleanup", now);
     scheduleOnce(world.db, "farm-weeks", now);
+    scheduleOnce(world.db, "election", now);
 }
 
 /** Runs every job due by `now`. One failing doesn't hold up the rest. */

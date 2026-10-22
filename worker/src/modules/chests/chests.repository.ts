@@ -4,7 +4,7 @@ import { AppError } from "../../../../server/src/http/AppError";
 import type { World } from "../../app";
 import type { Db } from "../../db/db";
 import * as playerRepository from "../player/player.repository";
-import { FIND_HISTORY, FIND_PENDING, FIND_SELECTION, INSERT_SELECTION, MARK_OPENED } from "./chests.sql.ts";
+import { COUNT_PENDING, FIND_HISTORY, FIND_PENDING, FIND_SELECTION, INSERT_SELECTION, MARK_OPENED } from "./chests.sql.ts";
 import type { ChestSelectionRecord } from "./chests.types";
 
 /** Chests won and waiting to be opened, from server/src/modules/chests/geo-chests.repository.ts. */
@@ -48,6 +48,10 @@ export function createSelection(
     if (!row) throw new Error("Chest selection insert returned nothing");
     world.db.afterCommit(() => world.hub.badgesChanged([playerId]));
     return row;
+}
+
+export function countPending(db: Db, playerId: string): number {
+    return db.one<{ count: number }>(COUNT_PENDING, playerId)?.count ?? 0;
 }
 
 export function listChests(db: Db, playerId: string): GeoChestsResponse {

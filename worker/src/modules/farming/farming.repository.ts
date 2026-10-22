@@ -13,6 +13,7 @@ import {
     refreshOrders,
     seededLookup,
     stepFarm,
+    tickFarm,
     type FarmHandCard,
     type FarmState,
     type StoredFarm,
@@ -220,6 +221,44 @@ export function actFarm(db: Db, playerId: string, action: GeoFarmAction): GeoFar
               : [],
     );
     return viewOf(db, playerId, result.state, loaded.weather, afterAway(loaded.away, { log: result.log, gained: result.gains, xpGained: result.xp }), handAfter);
+}
+
+/**
+ * Playtesting: the admin's own farm takes its next cycle now (after any that
+ * came due), as the clock would play it. The caller audits it.
+ */
+export function adminNextCycle(db: Db, playerId: string): GeoFarmView {
+    const now = new Date();
+    const loaded = loadFarm(db, playerId, now);
+    const { state, weather, away } = loaded;
+    const step = tickFarm(
+        state,
+        {
+            crops: CONTENT.crops,
+            mutations: CONTENT.mutations,
+            pests: CONTENT.pests,
+            structures: CONTENT.structures,
+            events: CONTENT.farmEvents,
+            globalEvent: activeGlobalEvent(now, FARMING, CONTENT.farmEvents),
+            sellValue,
+            itemName,
+            config: FARMING,
+            now,
+            // A turn plays no cards or held items.
+            hand: [],
+            held: {},
+            farmingLevel: farmingLevel(db, playerId),
+            ...farmingStats(db, playerId),
+            weather,
+        },
+        weather(new Date(state.accruedAt).getTime()),
+    );
+    if (step.gains.length > 0) playerRepository.grantItems(db, playerId, step.gains);
+    if (step.xp > 0) playerRepository.addSkillXp(db, playerId, "farming", step.xp);
+    recordHarvests(db, playerId, step.harvested, now);
+    const next = refreshOrders(step.state, FARMING, CONTENT.crops, sellValue, now);
+    saveFarm(db, playerId, loaded, next);
+    return viewOf(db, playerId, next, weather, afterAway(away, { log: ["Admin: skipped ahead one cycle.", ...step.log], gained: step.gains, xpGained: step.xp }));
 }
 
 /**

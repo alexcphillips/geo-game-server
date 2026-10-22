@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [
         cloudflareTest({
             wrangler: { configPath: "./wrangler.jsonc" },
-            miniflare: { bindings: { GEO_JWT_SECRET: "test-secret" } },
+            miniflare: { bindings: { GEO_JWT_SECRET: "test-secret", GEO_OPS_SECRET: "ops-secret" } },
         }),
     ],
 });

@@ -28,6 +28,12 @@ export const ENV = {
     /** Signs tokens and seeds spawns. Changing it signs everyone out and reshuffles spawns. */
     GEO_JWT_SECRET: required("GEO_JWT_SECRET"),
 
+    /**
+     * The operator's key to the Worker's `/geo/ops/*` (its GEO_OPS_SECRET),
+     * for the dev scripts run with `--url`: geo:admin, wipe:geo, the smoke kit.
+     */
+    GEO_OPS_SECRET: optional("GEO_OPS_SECRET", ""),
+
     /** Browser origins allowed to call this API (the app itself is native and needs none). */
     CORS_ORIGINS: optional("CORS_ORIGINS", "")
         .split(",")

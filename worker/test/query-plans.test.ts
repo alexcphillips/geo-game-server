@@ -19,6 +19,25 @@ const ALLOWED_SCANS: Record<string, string> = {
     "jobs/jobs.sql.ts:NEXT_DUE": "as FIND_DUE",
     "jobs/jobs.sql.ts:DELETE_OLD_REFRESH_TOKENS": "once a day; an index on expiry would cost a write on every sign-in and refresh",
     "dungeons/dungeons.sql.ts:LIST_OPEN_LOBBIES": "walks dungeon_lobbies_open, a partial index holding only lobbies waiting to start",
+    "inbox/inbox.sql.ts:FIND_ANNOUNCEMENTS": "walks announcements_created newest first and stops at 100",
+    "market/market.sql.ts:FIND_ACTIVE_SINGLES": "walks market_listings_singles (live single items only) newest first and stops at 500",
+    "ops/ops.sql.ts:RESET_PLAYERS": "the wipe: every player, on purpose",
+    "ops/ops.sql.ts:DELETE_PROGRESS_JOBS": "the wipe: due holds a few rows (see FIND_DUE)",
+    // Admin pages: an admin opens them now and then, and an index for each would cost writes all day.
+    "admin/admin.sql.ts:FIND_ALL_PLAYERS": "admin only; walks every player",
+    "admin/admin.sql.ts:SEARCH_PLAYERS": "admin only; a LIKE '%…%' can't use an index",
+    "admin/admin.sql.ts:FIND_AUDIT": "admin only; walks the rowid newest first and stops at 200",
+    "admin/admin.sql.ts:SUM_PURSES": "admin only (economy page)",
+    "admin/admin.sql.ts:LEDGER_LAST_DAY": "admin only (economy page); an index on time would cost a write per coin movement",
+    "admin/admin.sql.ts:LEDGER_MISMATCHES": "admin only (economy page): checks every purse against every ledger row",
+    "market/market.sql.ts:SUM_HELD_ALL": "admin only (economy page)",
+    "market/market.sql.ts:SUM_UNCOLLECTED_ALL": "admin only (economy page)",
+    "feedback/feedback.sql.ts:FIND_ALL_FEEDBACK": "admin only; one status at a time uses feedback_status",
+    "feedback/feedback.sql.ts:COUNT_FEEDBACK": "admin only; walks feedback_status",
+    "suggestions/suggestions.sql.ts:FIND_ALL_SUGGESTIONS": "admin only; one status at a time uses location_suggestions_status",
+    "suggestions/suggestions.sql.ts:COUNT_SUGGESTIONS": "admin only; walks location_suggestions_status",
+    "inbox/inbox.sql.ts:FIND_ALL_ANNOUNCEMENTS": "admin only; walks announcements_created newest first and stops at 200",
+    "places/places.sql.ts:FIND_PLACES": "admin only; walks places_created newest first and stops at 1000",
 };
 
 const modules = import.meta.glob<Record<string, unknown>>("../src/modules/**/*.sql.ts", { eager: true });

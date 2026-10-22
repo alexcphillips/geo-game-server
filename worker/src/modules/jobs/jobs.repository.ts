@@ -3,7 +3,7 @@ import { ADD_DUE, CLEAR_DUE, DELETE_OLD_REFRESH_TOKENS, FIND_DUE, FIND_DUE_AT, N
 
 /**
  * The `due` table: what must happen at a time with nobody acting, by key
- * (`battle:<id>`, `dungeon:<id>`, `cleanup`, `farm-weeks`). It replaces the
+ * (`battle:<id>`, `dungeon:<id>`, `auction:<id>`, `election`, `cleanup`, `farm-weeks`). It replaces the
  * Express server's 15 s tick (jobs.ts) and in-process timers (lib/wake.ts):
  * the World keeps one alarm at the soonest row (world.ts), and src/jobs.ts
  * runs what's due. A row survives a restart, so nothing is dropped.

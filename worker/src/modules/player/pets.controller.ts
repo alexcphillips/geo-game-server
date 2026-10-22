@@ -14,7 +14,7 @@ import type { InventoryRow } from "./player.types";
 /**
  * The player's pets: which one is active, and what each holds, from
  * server/src/modules/player/geo-pets.controller.ts. Kat's rarity upgrades
- * are a vendor's (session 4).
+ * are a vendor's (modules/vendors).
  */
 
 type Ctx = Context<AppEnv>;

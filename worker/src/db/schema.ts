@@ -525,6 +525,40 @@ const MIGRATIONS: string[][] = [
         `DROP INDEX runs_player;`,
         `CREATE INDEX runs_player_shared ON runs (player_id, created_at) WHERE battle_id IS NOT NULL;`,
     ],
+
+    // 5: the Market. Browsing walks the live single items (stacks have no
+    // source copy) newest first and stops at the page's 500; an entry costs a
+    // write when a single is listed and when it ends.
+    //
+    // The refund (from server/src/db/geo.schema.ts): a deleted
+    // player takes their listings with them; other players' coins held by
+    // bids on those listings go back to them first, through the ledger,
+    // rather than vanishing. Only an admin deletes a player.
+    [
+        `CREATE INDEX market_listings_singles ON market_listings (created_at)
+            WHERE status = 'active' AND source_inventory_id IS NOT NULL;`,
+        `CREATE TRIGGER market_refund_on_seller_delete BEFORE DELETE ON players
+        BEGIN
+            INSERT INTO coin_ledger (player_id, delta, reason, reference, created_at)
+            SELECT b.bidder_id, b.amount, 'market-bid-return', 'listing:' || b.listing_id, CAST(unixepoch('subsec') * 1000 AS INTEGER)
+            FROM market_listings l JOIN market_bids b ON b.listing_id = l.id AND b.status = 'held'
+            WHERE l.seller_id = OLD.id AND b.bidder_id <> OLD.id;
+
+            UPDATE players SET coins = coins + (
+                SELECT sum(b.amount)
+                FROM market_listings l JOIN market_bids b ON b.listing_id = l.id AND b.status = 'held'
+                WHERE l.seller_id = OLD.id AND b.bidder_id = players.id
+            )
+            WHERE id IN (
+                SELECT b.bidder_id
+                FROM market_listings l JOIN market_bids b ON b.listing_id = l.id AND b.status = 'held'
+                WHERE l.seller_id = OLD.id AND b.bidder_id <> OLD.id
+            );
+
+            UPDATE market_bids SET status = 'returned'
+            WHERE status = 'held' AND listing_id IN (SELECT id FROM market_listings WHERE seller_id = OLD.id);
+        END;`,
+    ],
 ];
 
 export function migrate(db: Db) {

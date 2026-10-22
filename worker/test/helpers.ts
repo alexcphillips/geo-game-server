@@ -1,7 +1,7 @@
 import { env, runInDurableObject, SELF } from "cloudflare:test";
 import { GEO_API_PATHS, type GeoMeResponse, type GeoSession } from "@geo/shared";
 import type { Db } from "../src/db/db";
-import { grantItems } from "../src/modules/player/player.repository";
+import { addCoins, grantItems } from "../src/modules/player/player.repository";
 import type { World } from "../src/world";
 
 /** Shared by the endpoint tests: requests against the real Worker, and reaching into the World's database. */
@@ -66,3 +66,10 @@ export const path = (template: string, params: Record<string, string | number>) 
 
 /** Puts items straight into a player's inventory; their new rows' ids. */
 export const grant = (playerId: string, itemId: string, quantity = 1) => inWorld((db) => grantItems(db, playerId, [{ itemId, quantity }]));
+
+/** Makes a player a game admin, as the first admin is made (ops) or another admin would. */
+export const makeAdmin = (playerId: string) => inWorld((db) => db.run(`UPDATE players SET role = 'admin' WHERE id = ?;`, playerId));
+
+/** Gives a player coins straight away, through the ledger. */
+export const giveCoins = (playerId: string, amount: number) =>
+    inWorld((db) => addCoins(db, playerId, amount, "admin-grant", "test"));

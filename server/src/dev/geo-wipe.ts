@@ -3,6 +3,7 @@ import { pool } from "../db";
 import { ensureGeoSchema } from "../db/geo.schema";
 import { withTransaction } from "../db/transaction";
 import { grantStarterKit } from "../modules/accounts/geo-accounts.repository";
+import { GEO_OPS_PATHS, ops, workerUrl } from "./ops-client";
 
 /**
  * Wipes every player's progress back to a fresh start, keeping their account:
@@ -17,6 +18,9 @@ import { grantStarterKit } from "../modules/accounts/geo-accounts.repository";
  *
  *     npm run wipe:geo            # shows what it would delete
  *     npm run wipe:geo -- --yes   # wipes
+ *
+ * Add `--url <base>` to wipe the Cloudflare Worker's World instead (needs
+ * GEO_OPS_SECRET); it runs the same wipe in the World's own database.
  */
 if (IS_PRODUCTION) throw new Error("geo-wipe refuses to run in production");
 
@@ -50,8 +54,18 @@ const PROGRESS_TABLES = [
     "skill_xp",
 ];
 
+/** The same wipe on the Worker (`POST /geo/ops/wipe`). */
+async function wipeWorker(url: string, confirmed: boolean) {
+    const result = await ops<{ accounts: number; rows: Record<string, number>; wiped: boolean }>(url, GEO_OPS_PATHS.wipe, { confirm: confirmed });
+    const counts = Object.entries(result.rows).map(([table, n]) => `${table}: ${n}`);
+    console.log(`${url}: ${result.accounts} accounts kept. Rows ${result.wiped ? "deleted" : "to delete"}:\n  ${counts.join("\n  ")}`);
+    console.log(result.wiped ? `\nWiped. ${result.accounts} accounts start fresh with the starter kit.` : "\nDry run. Pass --yes to wipe.");
+}
+
 async function main() {
     const confirmed = process.argv.includes("--yes");
+    const url = workerUrl();
+    if (url) return wipeWorker(url, confirmed);
     await ensureGeoSchema();
 
     const counts = await Promise.all(

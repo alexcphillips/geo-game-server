@@ -121,15 +121,18 @@ function itemSources(): GeoItemSource[] {
     return [...drops, ...stock];
 }
 
-/** Item names, icons and rarities, so the app can draw an inventory; and every recipe. */
-export async function getContent(_req: Request, res: Response) {
-    const body: GeoContentResponse = {
+/** Item names, icons and rarities, so the app can draw an inventory; and every recipe. Pure: the Worker serves it too. */
+export function contentBody(): GeoContentResponse {
+    return {
         items: Object.values(CONTENT.items).map(toItemView),
         recipes: Object.values(CONTENT.recipes).map(toRecipeView),
         sources: itemSources(),
         reforges: Object.values(CONTENT.reforges).map(toReforgeView),
     };
-    res.status(200).json(body);
+}
+
+export async function getContent(_req: Request, res: Response) {
+    res.status(200).json(contentBody());
 }
 
 export async function getHealth(_req: Request, res: Response) {
