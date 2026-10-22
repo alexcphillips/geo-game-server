@@ -257,7 +257,7 @@ const MIGRATIONS: string[][] = [
         ) STRICT;`,
         // At most one Run in progress per player; also how the live one is found.
         `CREATE UNIQUE INDEX runs_one_active ON runs (player_id) WHERE status = 'active';`,
-        // A player's past Runs (history, chests), and the cascade when a player goes.
+        // Narrowed to shared fights in step 4.
         `CREATE INDEX runs_player ON runs (player_id, created_at);`,
         `CREATE INDEX runs_battle ON runs (battle_id) WHERE battle_id IS NOT NULL;`,
         `CREATE INDEX runs_dungeon_run ON runs (dungeon_run_id) WHERE dungeon_run_id IS NOT NULL;`,
@@ -500,6 +500,30 @@ const MIGRATIONS: string[][] = [
             claimed_at INTEGER,
             PRIMARY KEY (player_id, quest_id)
         ) STRICT, WITHOUT ROWID;`,
+    ],
+
+    // 3: the scheduler (modules/jobs). One row per thing that must happen at a
+    // time with nobody acting: a shared fight's turn clock, a dungeon's
+    // ready-up, the daily cleanup, the farm week. The World keeps one alarm
+    // at the soonest. No index on `at`: the table holds one row per live
+    // fight or dungeon plus a few, and every reschedule would write one.
+    [
+        `CREATE TABLE due (
+            key TEXT PRIMARY KEY,
+            at INTEGER NOT NULL
+        ) STRICT, WITHOUT ROWID;`,
+        // A dungeon's next wake is a `due` row now.
+        `DROP INDEX dungeon_runs_wake;`,
+        `ALTER TABLE dungeon_runs DROP COLUMN wake_at;`,
+    ],
+
+    // 4: nothing reads a player's past Runs but the socket's snapshot of
+    // their latest shared fight (session 5), so only shared-fight rows pay
+    // for an entry: one write fewer per fight or fishing spot. A player's
+    // deletion (rare, an admin's) scans for their Runs.
+    [
+        `DROP INDEX runs_player;`,
+        `CREATE INDEX runs_player_shared ON runs (player_id, created_at) WHERE battle_id IS NOT NULL;`,
     ],
 ];
 

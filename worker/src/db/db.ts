@@ -13,6 +13,8 @@ export class Db {
     rowsRead = 0;
     rowsWritten = 0;
     private readonly storage: DurableObjectStorage;
+    /** Work waiting on the outermost transaction's commit; null outside one. */
+    private committing: (() => void)[] | null = null;
 
     constructor(storage: DurableObjectStorage) {
         this.storage = storage;
@@ -39,9 +41,39 @@ export class Db {
         return cursor.rowsWritten;
     }
 
-    /** All or nothing: a throw inside rolls every write back. Synchronous on purpose. */
+    /**
+     * All or nothing: a throw inside rolls every write back. Synchronous on
+     * purpose. Nested, it's a savepoint: a throw out of the inner one undoes
+     * only its own writes, and the outer one can carry on.
+     */
     transaction<T>(work: () => T): T {
-        return this.storage.transactionSync(work);
+        if (this.committing) return this.storage.transactionSync(work);
+        const queue: (() => void)[] = [];
+        this.committing = queue;
+        let result: T;
+        try {
+            result = this.storage.transactionSync(work);
+        } finally {
+            this.committing = null;
+        }
+        for (const then of queue) {
+            try {
+                then();
+            } catch (error) {
+                console.error("after commit:", error);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Runs `then` once the transaction in progress commits (straight away
+     * outside one); never if it rolls back. For telling players about a
+     * change: a push must not go out for writes that were undone.
+     */
+    afterCommit(then: () => void) {
+        if (this.committing) this.committing.push(then);
+        else then();
     }
 
     private count(cursor: SqlStorageCursor<Record<string, SqlStorageValue>>) {

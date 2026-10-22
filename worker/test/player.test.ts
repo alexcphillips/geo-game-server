@@ -7,16 +7,14 @@ import {
     type GeoMeResponse,
 } from "@geo/shared";
 import { GAME_CONFIG } from "../../server/src/content";
-import { addCoins, grantItems } from "../src/modules/player/player.repository";
-import { amountOf, call, inWorld, newPlayer, path, rowsWrittenBy } from "./helpers";
+import { addCoins } from "../src/modules/player/player.repository";
+import { amountOf, call, grant, inWorld, newPlayer, path, rowsWrittenBy } from "./helpers";
 
 /** The player module end to end in workerd: ported from server/src/dev/geo-smoke.ts and geo-bank-smoke.ts. */
 
 const me = GEO_API_PATHS.me;
 const CAMP = { latitude: 51.50713, longitude: -0.12794 };
 const AWAY = { latitude: 51.52, longitude: -0.1279 };
-
-const grant = (playerId: string, itemId: string, quantity = 1) => inWorld((db) => grantItems(db, playerId, [{ itemId, quantity }]));
 
 describe("player", () => {
     it("refuses a missing or bad token", async () => {
@@ -185,11 +183,13 @@ describe("player", () => {
 
     it("refuses mid-Run changes while a Run is going", async () => {
         const { token, id, me: read } = await newPlayer("midrun");
+        // Touched just now: one left too long would have ended (see the stale-Run test in runs.test.ts).
         await inWorld((db) =>
             db.run(
-                `INSERT INTO runs (id, player_id, kind, state, created_at, updated_at) VALUES (?, ?, 'combat', '{}', 0, 0);`,
+                `INSERT INTO runs (id, player_id, kind, state, created_at, updated_at) VALUES (?1, ?2, 'combat', '{}', ?3, ?3);`,
                 crypto.randomUUID(),
                 id,
+                Date.now(),
             ),
         );
         const hand = (await read()).hands.combat!;

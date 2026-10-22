@@ -266,7 +266,19 @@ export function unpackLunchbox(c: Ctx) {
     });
 }
 
-// TODO(session 3): POST /geo/me/lunchbox/:slot/eat, with the fight engine's eatBetweenFights.
+/**
+ * Eats one food from a lunchbox slot between fights. Works anywhere (only
+ * packing is camp-only), so the lunchbox is all the food a player has while
+ * away. Only its effect on health counts (heals, or harm that stops at 1);
+ * buffs and statuses only work in a fight. Not mid-Run: the fight eats as a turn.
+ */
+export function eatLunchbox(c: Ctx) {
+    const slot = parseSlot(c, GEO_LUNCHBOX_MAX_SLOTS, "lunchbox");
+    return changeMe(c, (db, playerId) => {
+        runsRepository.assertNotInRun(db, playerId, "Eat as your turn in the fight");
+        runsRepository.eatBetweenFightsFor(c.var.world, playerId, slot);
+    });
+}
 
 /** Puts back whatever bait is packed in a slot. */
 function unpackBaitSlot(db: Db, playerId: string, slot: number) {

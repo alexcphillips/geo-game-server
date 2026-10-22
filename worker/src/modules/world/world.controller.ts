@@ -17,6 +17,7 @@ import { rollSpawnCount, SPAWN_RULES, windowAt, type NearPlaces } from "../../..
 import type { AppEnv } from "../../app";
 import { requirePlayerId } from "../../http/auth";
 import { jsonBody } from "../../http/body";
+import { devTools } from "../../http/dev";
 import { secretSeed } from "../../lib/secret-seed";
 import { findPlacesNear } from "../places/places.repository";
 import * as worldRepository from "./world.repository";
@@ -27,8 +28,6 @@ import * as worldRepository from "./world.repository";
  */
 
 type Ctx = Context<AppEnv>;
-
-const devTools = (c: Ctx) => c.var.world.env.GEO_DEV_TOOLS === "true";
 
 /** How many spawns this player has this window. Secret-seeded: steady within a window, never stored. */
 async function windowCountFor(c: Ctx, playerId: string, now: number): Promise<number> {

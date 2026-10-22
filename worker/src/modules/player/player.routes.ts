@@ -20,6 +20,7 @@ playerRoutes.post(me.loadSavedHand, auth, playerController.loadSavedHand);
 playerRoutes.delete(me.savedHand, auth, playerController.deleteSavedHand);
 playerRoutes.put(me.lunchboxSlot, auth, playerController.packLunchbox);
 playerRoutes.delete(me.lunchboxSlot, auth, playerController.unpackLunchbox);
+playerRoutes.post(me.eatLunchbox, auth, playerController.eatLunchbox);
 playerRoutes.put(me.baitSlot, auth, playerController.packBait);
 playerRoutes.delete(me.baitSlot, auth, playerController.unpackBait);
 playerRoutes.put(me.camp, auth, playerController.setCamp);

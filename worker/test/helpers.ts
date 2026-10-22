@@ -1,6 +1,7 @@
 import { env, runInDurableObject, SELF } from "cloudflare:test";
 import { GEO_API_PATHS, type GeoMeResponse, type GeoSession } from "@geo/shared";
 import type { Db } from "../src/db/db";
+import { grantItems } from "../src/modules/player/player.repository";
 import type { World } from "../src/world";
 
 /** Shared by the endpoint tests: requests against the real Worker, and reaching into the World's database. */
@@ -62,3 +63,6 @@ export const amountOf = (me: GeoMeResponse, itemId: string) =>
 
 export const path = (template: string, params: Record<string, string | number>) =>
     Object.entries(params).reduce((result, [key, value]) => result.replace(`:${key}`, String(value)), template);
+
+/** Puts items straight into a player's inventory; their new rows' ids. */
+export const grant = (playerId: string, itemId: string, quantity = 1) => inWorld((db) => grantItems(db, playerId, [{ itemId, quantity }]));

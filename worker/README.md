@@ -7,19 +7,28 @@ Cloudflare"). Live at https://geo-game.alexphillipsdev.workers.dev.
 ```
 src/
 ├── index.ts        the Worker: forwards every request to the one World object (≈0–1 ms CPU)
-├── world.ts        the World Durable Object: owns the SQLite database, runs the API
+├── world.ts        the World Durable Object: owns the SQLite database, runs the API, keeps one alarm
 ├── app.ts          Hono wiring: routes, 404, errors (AppError → status + { error }); the World's memory
-├── db/db.ts        Db: all / one / run / transaction over the object's SQLite; counts rows read and written
-├── db/schema.ts    numbered migrations, run when the World starts (step 2: every game table)
-├── http/           auth (bearer token → playerId, role), JSON body helpers, the in-memory rate limiter
+├── jobs.ts         what the alarm runs, by `due` key: turn clocks, dungeon wakes, farm weeks, cleanup
+├── db/db.ts        Db: all / one / run / transaction (nested = savepoint) / afterCommit; counts rows read and written
+├── db/schema.ts    numbered migrations, run when the World starts (2: every game table; 3: `due`; 4: a narrower runs index)
+├── http/           auth (bearer token → playerId, role), JSON body helpers, dev-tools switch, the rate limiter
 ├── lib/            PBKDF2 passwords, jose tokens, the secret spawn seed (all Web Crypto)
+├── realtime/hub.ts who's connected and pushes: a stand-in (nobody connected, nobody gone) until session 5
 └── modules/        four-file modules, as in server/ (routes, controller, repository, sql)
     ├── accounts/   sign-up (with the starter kit), sign-in, refresh, sign-out
-    ├── player/     /geo/me: gear, bag, hands, lunchbox, bait, camp, bank, pets
+    ├── player/     /geo/me: gear, bag, hands, lunchbox (and eating from it), bait, camp, bank, pets
     ├── wardrobe/   loadouts, auto-swap
     ├── world/      spawns around the player
     ├── places/     hand-made places near the player
-    └── mayor/, quests/, runs/   read-only pieces other modules need until those modules move
+    ├── runs/       combat Runs, solo and shared (a party's boss), flee, dev kill
+    ├── fishing/    fishing Runs (same `runs` table)
+    ├── chests/     chests won, pending and opened
+    ├── dungeons/   lobbies: list, create, join, leave, start
+    ├── dungeon-runs/ a party's map, room by room, its ready-up; fights.ts is what Runs call back into
+    ├── farming/    the farm, the Research Lab, weekly contests
+    ├── jobs/       the `due` table: schedule(key, at)
+    └── mayor/, quests/, inbox/   the pieces other modules need until those modules move
 ```
 
 Pure game code (content, engine, AppError, account rules, spawns and travel,
@@ -40,9 +49,22 @@ stat sheet, modifier maths in `world/modifiers.ts`) is imported from
   body, a token, a password hash, a seed) first, then does every read and
   write in one `db.transaction(() => …)`, which takes no `await`. Other
   requests can run during an `await`, never inside the block.
+- **Don't set an indexed column to the value it has**: SQLite rewrites the
+  index entry anyway, a second write. `status` is in partial indexes
+  (`runs_one_active`, `dungeon_run_members_one_active`), so a step that
+  leaves a Run going uses `UPDATE_RUN_STATE`, and a dungeon member is saved
+  only when they changed (`saved` on the row). Measure with `rowsWrittenBy`.
 - **Memory instead of rows** (`World` in app.ts): presence, each player's
   walking (travel) and spawns' out-of-reach countdowns. A restart forgets
   them, which costs a little banked distance, nothing more.
+- **Timed work is a `due` row** (modules/jobs): `schedule(db, key, at)` books
+  or moves it, `null` clears it. The World keeps one alarm at the soonest
+  row, re-armed after each request only when that time moved (setting it is
+  a write). Add a job by adding its key's prefix to `JOBS` in jobs.ts. Never
+  `setTimeout`: the World can be evicted between requests.
+- **Pushes go after commit**: `db.afterCommit(() => world.hub.publish(…))`.
+  Until session 5 the hub is a stand-in: nobody is connected (pushes go
+  nowhere) and nobody counts as gone (turn clocks run their full length).
 - **Tables are STRICT**: a fractional number in an INTEGER column (times are
   whole ms) throws, where Postgres rounded. JSON columns are TEXT, a list of
   ids goes in as a JSON array and is read with `json_each(?)`.
