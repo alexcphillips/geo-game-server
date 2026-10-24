@@ -113,10 +113,10 @@ describe("accounts", () => {
         const refresh = await rowsWrittenBy(() => call(GEO_API_PATHS.auth.refresh, { refreshToken: session?.refreshToken }, "192.0.2.50"));
         console.log(`rows written: sign-up ${signUp}, sign-in ${signIn}, refresh ${refresh}`);
         // Sign-up: a player (row + 2 indexes) and a token (row + player index), then the starter
-        // kit: 15 inventory rows, 2 loadouts (+ 2 auto-swap index entries), the dagger worn, the
+        // kit: 16 inventory rows, 2 loadouts (+ 2 auto-swap index entries), the dagger and shield worn, the
         // active loadout set, 3 hands, the lunchbox and bait (row + index each). A refresh also
         // ends the old token.
-        expect(signUp).toBeLessThanOrEqual(33);
+        expect(signUp).toBeLessThanOrEqual(36);
         expect(signIn).toBeLessThanOrEqual(2);
         expect(refresh).toBeLessThanOrEqual(3);
     });

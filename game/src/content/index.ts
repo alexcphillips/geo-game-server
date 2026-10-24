@@ -236,6 +236,12 @@ export function checkContent(content: GameContent, config: GameConfig): string[]
 
     for (const enemy of Object.values(content.enemies)) {
         needStatuses(`Enemy "${enemy.id}"`, enemy.moves.flatMap((move) => move.actions), enemy.effects);
+        if (!enemy.moves.some((move) => move.weight > 0)) problems.push(`Enemy "${enemy.id}" needs a move with weight above 0`);
+        for (const move of enemy.moves) {
+            if (move.next && !enemy.moves.some((other) => other.id === move.next)) {
+                problems.push(`Enemy "${enemy.id}" move "${move.id}" has unknown next "${move.next}"`);
+            }
+        }
         for (const drop of enemy.loot) {
             needItem(`Enemy "${enemy.id}" loot`, drop.itemId);
             if (!isRange(drop.quantity)) problems.push(`Enemy "${enemy.id}" loot "${drop.itemId}": quantity min is over max`);

@@ -3,7 +3,6 @@ geo-game's backend. The app is `../geo-game`. Start with `game/src/README.md` (t
 - Three npm workspaces: `game/` (`@geo/game`: engine, rules, content; no I/O, runs in Node and the Worker), `worker/` (`@geo/worker`: the Worker + one World Durable Object with SQLite, Cloudflare free plan; `worker/scripts/` are Node scripts against it) and `shared/` (`@geo/shared`, the API contracts). `shared/` has no runtime dependencies and must run in the app too.
 - The Worker imports game code by relative path (`../../../../game/src/content`). Nothing in `game/` may import from `worker/` or use Node-only APIs outside `game/src/dev/`, `content/data.disk.ts` and tests.
 - After changing anything in `shared/src/`, run `npm run sync:contracts` in `../geo-game`.
-- The old Postgres tables are still in the `geo` schema of cozy-app's database; nothing reads them. Dropping it is a separate, asked-for step.
 
 ## Checking work
 
@@ -17,6 +16,7 @@ geo-game's backend. The app is `../geo-game`. Start with `game/src/README.md` (t
 - Reject with `AppError` (`badRequest`, `notFound`…) from `game/src/http/AppError.ts`. Shared request checks are in `game/src/lib/validate.ts` (`isUuid`, `wholeNumber`), each taking the endpoint's own error.
 - Content is one TypeScript file per thing in `game/src/data/`, typed `satisfies <Model>` from `#geo/models`. It loads through `content/data.generated.ts` (static imports, so it runs in a Worker): after adding, moving or removing a data file run `npm run data:index --workspace @geo/game`. The loader checks it at load.
 - Combat rules are data (`data/EFFECTS.md`); a new trigger, condition or action goes in `engine/engine.types.ts` and `engine/battle.ts`, with a test.
+- Missing art never blocks content. Build an enemy in full with its `sprite` id before the png exists: until geo-game has the image it just doesn't spawn on the map (`hasArt` in `game/src/world/spawns.ts`), and it starts spawning once the user adds it and the sprite list regenerates.
 - `game/src/world/app-sprites.generated.ts` is written by geo-game's sprite generator (runs on its `npm start`, or `npm run assets`); don't edit it.
 
 ## Shell

@@ -5,7 +5,7 @@ export default {
     name: "Bandit",
     sprite: "bandit",
     tier: 1,
-    stats: { maxHealth: 30, attack: 13, defense: 2, speed: 11 },
+    stats: { maxHealth: 34, attack: 14, defense: 2, speed: 11 },
     moves: [
         {
             id: "slash",

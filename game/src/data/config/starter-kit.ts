@@ -3,6 +3,7 @@ import type { StarterKitConfig } from "#geo/models";
 export default {
     items: [
         { itemId: "bronze-dagger", quantity: 1 },
+        { itemId: "plank-shield", quantity: 1 },
         { itemId: "twig-rod", quantity: 1 },
         { itemId: "card.slash", quantity: 1 },
         { itemId: "card.double-slash", quantity: 1 },
@@ -20,7 +21,7 @@ export default {
     ],
     // A loadout to fight in and one to fish in, tagged for auto-swap; the first is worn.
     loadouts: [
-        { name: "Combat", autoFor: "combat", equip: { mainHand: "bronze-dagger" } },
+        { name: "Combat", autoFor: "combat", equip: { mainHand: "bronze-dagger", offHand: "plank-shield" } },
         { name: "Fishing", autoFor: "fishing", equip: { mainHand: "twig-rod" } },
     ],
     handSkills: ["combat", "fishing", "farming"],

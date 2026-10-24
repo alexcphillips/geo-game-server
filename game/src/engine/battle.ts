@@ -404,7 +404,7 @@ function enemyTurn(ctx: Context, actor: Combatant): void {
         event: { type: "cardPlayed", actor: actor.id, target: target.id },
     });
     // The next move and its target, chosen now so the app can show them coming.
-    actor.intent = pickMove(ctx, moves)?.id;
+    actor.intent = moves.find((m) => m.id === move.next)?.id ?? pickMove(ctx, moves)?.id;
     actor.intentTarget = pickTarget(ctx)?.id;
 }
 
@@ -494,15 +494,17 @@ function previewActions(
     return parts;
 }
 
+/** By weight; a weight-0 move only ever comes as another's `next`. */
 function pickMove(ctx: Context, moves: EnemyMove[]): EnemyMove | undefined {
-    if (moves.length <= 1) return moves[0];
-    const total = moves.reduce((sum, move) => sum + move.weight, 0);
+    const pickable = moves.filter((move) => move.weight > 0);
+    if (pickable.length <= 1) return pickable[0];
+    const total = pickable.reduce((sum, move) => sum + move.weight, 0);
     let roll = ctx.rng.next() * total;
-    for (const move of moves) {
+    for (const move of pickable) {
         roll -= move.weight;
         if (roll < 0) return move;
     }
-    return moves.at(-1);
+    return pickable.at(-1);
 }
 
 function resolveCardTarget(

@@ -194,186 +194,187 @@ import * as f189 from "../data/materials/combat/silk-spool";
 import * as f190 from "../data/materials/combat/slime";
 import * as f191 from "../data/materials/combat/spider-fang";
 import * as f192 from "../data/materials/combat/sturdy-shell";
-import * as f193 from "../data/materials/farming/beetle-shell";
-import * as f194 from "../data/materials/farming/bloodmelon";
-import * as f195 from "../data/materials/farming/carrot-seeds";
-import * as f196 from "../data/materials/farming/carrot";
-import * as f197 from "../data/materials/farming/compost";
-import * as f198 from "../data/materials/farming/corn-seeds";
-import * as f199 from "../data/materials/farming/corn";
-import * as f200 from "../data/materials/farming/emberwheat";
-import * as f201 from "../data/materials/farming/golden-scarab";
-import * as f202 from "../data/materials/farming/grinning-gourd";
-import * as f203 from "../data/materials/farming/hexroot";
-import * as f204 from "../data/materials/farming/isotope";
-import * as f205 from "../data/materials/farming/melon-seeds";
-import * as f206 from "../data/materials/farming/melon";
-import * as f207 from "../data/materials/farming/mite-dust";
-import * as f208 from "../data/materials/farming/mouse-tail";
-import * as f209 from "../data/materials/farming/potato";
-import * as f210 from "../data/materials/farming/pumpkin-seeds";
-import * as f211 from "../data/materials/farming/pumpkin";
-import * as f212 from "../data/materials/farming/rainroot";
-import * as f213 from "../data/materials/farming/seed-potato";
-import * as f214 from "../data/materials/farming/stardust";
-import * as f215 from "../data/materials/farming/sugarroot";
-import * as f216 from "../data/materials/farming/veil-shard";
-import * as f217 from "../data/materials/farming/wheat-seeds";
-import * as f218 from "../data/materials/farming/wheat";
-import * as f219 from "../data/materials/farming/worm-castings";
-import * as f220 from "../data/materials/fishing/blue-shark-tooth";
-import * as f221 from "../data/materials/fishing/eel-gel";
-import * as f222 from "../data/materials/fishing/great-white-shark-tooth";
-import * as f223 from "../data/materials/fishing/kraken-ink";
-import * as f224 from "../data/materials/fishing/tiger-shark-tooth";
-import * as f225 from "../data/materials/fishing/whole-trout";
-import * as f226 from "../data/materials/foraging/bone-tree-wood";
-import * as f227 from "../data/materials/foraging/mushrooms";
-import * as f228 from "../data/materials/foraging/oak-logs";
-import * as f229 from "../data/materials/mining/coal";
-import * as f230 from "../data/materials/mining/gold-ore";
-import * as f231 from "../data/materials/mining/iron-ore";
-import * as f232 from "../data/materials/mining/ruby";
-import * as f233 from "../data/materials/mining/titanium-ore";
-import * as f234 from "../data/mayors/briar";
-import * as f235 from "../data/mayors/luna";
-import * as f236 from "../data/mayors/malphas";
-import * as f237 from "../data/mayors/marlon";
-import * as f238 from "../data/mayors/siegmoor";
-import * as f239 from "../data/misc/fishing-net-plus-1";
-import * as f240 from "../data/misc/fishing-net";
-import * as f241 from "../data/misc/gilded-chest-key";
-import * as f242 from "../data/misc/healing-draught";
-import * as f243 from "../data/misc/rift-lens";
-import * as f244 from "../data/misc/rusty-chest-key";
-import * as f245 from "../data/misc/sluice-key";
-import * as f246 from "../data/mutations/bloodmelon";
-import * as f247 from "../data/mutations/emberwheat";
-import * as f248 from "../data/mutations/grinning-gourd";
-import * as f249 from "../data/mutations/hexroot";
-import * as f250 from "../data/mutations/rainroot";
-import * as f251 from "../data/mutations/sugarroot";
-import * as f252 from "../data/pests/earthworm";
-import * as f253 from "../data/pests/field-mouse";
-import * as f254 from "../data/pests/glow-beetle";
-import * as f255 from "../data/pests/hopper-beetle";
-import * as f256 from "../data/pests/mite";
-import * as f257 from "../data/pests/rift-locust";
-import * as f258 from "../data/pests/shade-rat";
-import * as f259 from "../data/pet-items/silk-collar";
-import * as f260 from "../data/pets/tarantula";
-import * as f261 from "../data/quests/fresh-off-the-fire";
-import * as f262 from "../data/quests/rainy-day-fund";
-import * as f263 from "../data/quests/slime-cull";
-import * as f264 from "../data/quests/trial-1";
-import * as f265 from "../data/recipes/combat/envenom";
-import * as f266 from "../data/recipes/combat/shellbreaker-ring";
-import * as f267 from "../data/recipes/combat/slime-grip-wraps";
-import * as f268 from "../data/recipes/combat/venomfang-dagger";
-import * as f269 from "../data/recipes/cooking/cook-carp";
-import * as f270 from "../data/recipes/cooking/cook-catfish";
-import * as f271 from "../data/recipes/cooking/cook-musky";
-import * as f272 from "../data/recipes/cooking/cook-perch";
-import * as f273 from "../data/recipes/cooking/cook-pike";
-import * as f274 from "../data/recipes/cooking/cook-salmon";
-import * as f275 from "../data/recipes/cooking/cook-sturgeon";
-import * as f276 from "../data/recipes/cooking/cook-whiskers";
-import * as f277 from "../data/recipes/cooking/grilled-trout";
-import * as f278 from "../data/recipes/cooking/mushroom-stew";
-import * as f279 from "../data/recipes/farming/card-chain-reaction";
-import * as f280 from "../data/recipes/farming/card-exterminators-oath";
-import * as f281 from "../data/recipes/fishing/fishing-net-plus-1";
-import * as f282 from "../data/reforges/blessed";
-import * as f283 from "../data/reforges/heavy";
-import * as f284 from "../data/reforges/keen";
-import * as f285 from "../data/reforges/light";
-import * as f286 from "../data/reforges/pure";
-import * as f287 from "../data/reforges/snazzy";
-import * as f288 from "../data/reforges/violent";
-import * as f289 from "../data/reforges/wise";
-import * as f290 from "../data/rings/ember-ring";
-import * as f291 from "../data/rings/emerald-band";
-import * as f292 from "../data/rings/shellbreaker-ring";
-import * as f293 from "../data/rods/ashwood-rod";
-import * as f294 from "../data/rods/greenheart-rod";
-import * as f295 from "../data/rods/ironwood-rod";
-import * as f296 from "../data/rods/leviathan-rod";
-import * as f297 from "../data/rods/twig-rod";
-import * as f298 from "../data/room-styles/boss-den";
-import * as f299 from "../data/room-styles/slime-pool";
-import * as f300 from "../data/room-styles/sluice";
-import * as f301 from "../data/statuses/burning";
-import * as f302 from "../data/statuses/frozen";
-import * as f303 from "../data/statuses/paralyzed";
-import * as f304 from "../data/statuses/poisoned";
-import * as f305 from "../data/statuses/shelled";
-import * as f306 from "../data/statuses/spiced";
-import * as f307 from "../data/statuses/venom-coat";
-import * as f308 from "../data/statuses/well-fed";
-import * as f309 from "../data/structures/beehive";
-import * as f310 from "../data/structures/compost-bin";
-import * as f311 from "../data/structures/greenhouse";
-import * as f312 from "../data/structures/jukebox";
-import * as f313 from "../data/structures/mysterious-shrine";
-import * as f314 from "../data/structures/nuclear-reactor";
-import * as f315 from "../data/structures/pest-cage";
-import * as f316 from "../data/structures/pond";
-import * as f317 from "../data/structures/portal";
-import * as f318 from "../data/structures/well";
-import * as f319 from "../data/talismans/acorn-token";
-import * as f320 from "../data/talismans/ankh-of-return";
-import * as f321 from "../data/talismans/bird-claw";
-import * as f322 from "../data/talismans/bone-bead";
-import * as f323 from "../data/talismans/cauldron-charm";
-import * as f324 from "../data/talismans/compass-rose";
-import * as f325 from "../data/talismans/copper-charm";
-import * as f326 from "../data/talismans/crown-shard";
-import * as f327 from "../data/talismans/crystal-eye";
-import * as f328 from "../data/talismans/deep-anchor";
-import * as f329 from "../data/talismans/diamond-band";
-import * as f330 from "../data/talismans/digested-shrimp";
-import * as f331 from "../data/talismans/ember-heart";
-import * as f332 from "../data/talismans/emerald-collar";
-import * as f333 from "../data/talismans/emerald-shard";
-import * as f334 from "../data/talismans/eye-of-the-watcher";
-import * as f335 from "../data/talismans/feather-cord";
-import * as f336 from "../data/talismans/fire-gem";
-import * as f337 from "../data/talismans/fishers-knot";
-import * as f338 from "../data/talismans/four-leaf-clover";
-import * as f339 from "../data/talismans/fox-fang";
-import * as f340 from "../data/talismans/frost-orb";
-import * as f341 from "../data/talismans/gem-chain";
-import * as f342 from "../data/talismans/heart-locket";
-import * as f343 from "../data/talismans/holy-sigil";
-import * as f344 from "../data/talismans/hourglass-bead";
-import * as f345 from "../data/talismans/jellybean-jar";
-import * as f346 from "../data/talismans/lantern-charm";
-import * as f347 from "../data/talismans/lucky-clover";
-import * as f348 from "../data/talismans/moonstone";
-import * as f349 from "../data/talismans/mysterious-effigy";
-import * as f350 from "../data/talismans/owl-feather";
-import * as f351 from "../data/talismans/owl-kings-plume";
-import * as f352 from "../data/talismans/pendant-of-ages";
-import * as f353 from "../data/talismans/rune-pebble";
-import * as f354 from "../data/talismans/scarab-charm";
-import * as f355 from "../data/talismans/seed-pouch-charm";
-import * as f356 from "../data/talismans/skull-ring";
-import * as f357 from "../data/talismans/snail-shell";
-import * as f358 from "../data/talismans/spider-eye";
-import * as f359 from "../data/talismans/storm-charm";
-import * as f360 from "../data/talismans/sunken-idol";
-import * as f361 from "../data/talismans/sunstone";
-import * as f362 from "../data/talismans/topaz-chip";
-import * as f363 from "../data/talismans/totem-of-the-deep";
-import * as f364 from "../data/talismans/wolf-tooth";
-import * as f365 from "../data/vendors/angler";
-import * as f366 from "../data/vendors/baker";
-import * as f367 from "../data/vendors/blacksmith";
-import * as f368 from "../data/vendors/farmer";
-import * as f369 from "../data/vendors/kat";
-import * as f370 from "../data/weapons/bronze-dagger";
-import * as f371 from "../data/weapons/claymore";
-import * as f372 from "../data/weapons/venomfang-dagger";
+import * as f193 from "../data/materials/combat/tiny-ember";
+import * as f194 from "../data/materials/farming/beetle-shell";
+import * as f195 from "../data/materials/farming/bloodmelon";
+import * as f196 from "../data/materials/farming/carrot-seeds";
+import * as f197 from "../data/materials/farming/carrot";
+import * as f198 from "../data/materials/farming/compost";
+import * as f199 from "../data/materials/farming/corn-seeds";
+import * as f200 from "../data/materials/farming/corn";
+import * as f201 from "../data/materials/farming/emberwheat";
+import * as f202 from "../data/materials/farming/golden-scarab";
+import * as f203 from "../data/materials/farming/grinning-gourd";
+import * as f204 from "../data/materials/farming/hexroot";
+import * as f205 from "../data/materials/farming/isotope";
+import * as f206 from "../data/materials/farming/melon-seeds";
+import * as f207 from "../data/materials/farming/melon";
+import * as f208 from "../data/materials/farming/mite-dust";
+import * as f209 from "../data/materials/farming/mouse-tail";
+import * as f210 from "../data/materials/farming/potato";
+import * as f211 from "../data/materials/farming/pumpkin-seeds";
+import * as f212 from "../data/materials/farming/pumpkin";
+import * as f213 from "../data/materials/farming/rainroot";
+import * as f214 from "../data/materials/farming/seed-potato";
+import * as f215 from "../data/materials/farming/stardust";
+import * as f216 from "../data/materials/farming/sugarroot";
+import * as f217 from "../data/materials/farming/veil-shard";
+import * as f218 from "../data/materials/farming/wheat-seeds";
+import * as f219 from "../data/materials/farming/wheat";
+import * as f220 from "../data/materials/farming/worm-castings";
+import * as f221 from "../data/materials/fishing/blue-shark-tooth";
+import * as f222 from "../data/materials/fishing/eel-gel";
+import * as f223 from "../data/materials/fishing/great-white-shark-tooth";
+import * as f224 from "../data/materials/fishing/kraken-ink";
+import * as f225 from "../data/materials/fishing/tiger-shark-tooth";
+import * as f226 from "../data/materials/fishing/whole-trout";
+import * as f227 from "../data/materials/foraging/bone-tree-wood";
+import * as f228 from "../data/materials/foraging/mushrooms";
+import * as f229 from "../data/materials/foraging/oak-logs";
+import * as f230 from "../data/materials/mining/coal";
+import * as f231 from "../data/materials/mining/gold-ore";
+import * as f232 from "../data/materials/mining/iron-ore";
+import * as f233 from "../data/materials/mining/ruby";
+import * as f234 from "../data/materials/mining/titanium-ore";
+import * as f235 from "../data/mayors/briar";
+import * as f236 from "../data/mayors/luna";
+import * as f237 from "../data/mayors/malphas";
+import * as f238 from "../data/mayors/marlon";
+import * as f239 from "../data/mayors/siegmoor";
+import * as f240 from "../data/misc/fishing-net-plus-1";
+import * as f241 from "../data/misc/fishing-net";
+import * as f242 from "../data/misc/gilded-chest-key";
+import * as f243 from "../data/misc/healing-draught";
+import * as f244 from "../data/misc/rift-lens";
+import * as f245 from "../data/misc/rusty-chest-key";
+import * as f246 from "../data/misc/sluice-key";
+import * as f247 from "../data/mutations/bloodmelon";
+import * as f248 from "../data/mutations/emberwheat";
+import * as f249 from "../data/mutations/grinning-gourd";
+import * as f250 from "../data/mutations/hexroot";
+import * as f251 from "../data/mutations/rainroot";
+import * as f252 from "../data/mutations/sugarroot";
+import * as f253 from "../data/pests/earthworm";
+import * as f254 from "../data/pests/field-mouse";
+import * as f255 from "../data/pests/glow-beetle";
+import * as f256 from "../data/pests/hopper-beetle";
+import * as f257 from "../data/pests/mite";
+import * as f258 from "../data/pests/rift-locust";
+import * as f259 from "../data/pests/shade-rat";
+import * as f260 from "../data/pet-items/silk-collar";
+import * as f261 from "../data/pets/tarantula";
+import * as f262 from "../data/quests/fresh-off-the-fire";
+import * as f263 from "../data/quests/rainy-day-fund";
+import * as f264 from "../data/quests/slime-cull";
+import * as f265 from "../data/quests/trial-1";
+import * as f266 from "../data/recipes/combat/envenom";
+import * as f267 from "../data/recipes/combat/shellbreaker-ring";
+import * as f268 from "../data/recipes/combat/slime-grip-wraps";
+import * as f269 from "../data/recipes/combat/venomfang-dagger";
+import * as f270 from "../data/recipes/cooking/cook-carp";
+import * as f271 from "../data/recipes/cooking/cook-catfish";
+import * as f272 from "../data/recipes/cooking/cook-musky";
+import * as f273 from "../data/recipes/cooking/cook-perch";
+import * as f274 from "../data/recipes/cooking/cook-pike";
+import * as f275 from "../data/recipes/cooking/cook-salmon";
+import * as f276 from "../data/recipes/cooking/cook-sturgeon";
+import * as f277 from "../data/recipes/cooking/cook-whiskers";
+import * as f278 from "../data/recipes/cooking/grilled-trout";
+import * as f279 from "../data/recipes/cooking/mushroom-stew";
+import * as f280 from "../data/recipes/farming/card-chain-reaction";
+import * as f281 from "../data/recipes/farming/card-exterminators-oath";
+import * as f282 from "../data/recipes/fishing/fishing-net-plus-1";
+import * as f283 from "../data/reforges/blessed";
+import * as f284 from "../data/reforges/heavy";
+import * as f285 from "../data/reforges/keen";
+import * as f286 from "../data/reforges/light";
+import * as f287 from "../data/reforges/pure";
+import * as f288 from "../data/reforges/snazzy";
+import * as f289 from "../data/reforges/violent";
+import * as f290 from "../data/reforges/wise";
+import * as f291 from "../data/rings/ember-ring";
+import * as f292 from "../data/rings/emerald-band";
+import * as f293 from "../data/rings/shellbreaker-ring";
+import * as f294 from "../data/rods/ashwood-rod";
+import * as f295 from "../data/rods/greenheart-rod";
+import * as f296 from "../data/rods/ironwood-rod";
+import * as f297 from "../data/rods/leviathan-rod";
+import * as f298 from "../data/rods/twig-rod";
+import * as f299 from "../data/room-styles/boss-den";
+import * as f300 from "../data/room-styles/slime-pool";
+import * as f301 from "../data/room-styles/sluice";
+import * as f302 from "../data/statuses/burning";
+import * as f303 from "../data/statuses/frozen";
+import * as f304 from "../data/statuses/paralyzed";
+import * as f305 from "../data/statuses/poisoned";
+import * as f306 from "../data/statuses/shelled";
+import * as f307 from "../data/statuses/spiced";
+import * as f308 from "../data/statuses/venom-coat";
+import * as f309 from "../data/statuses/well-fed";
+import * as f310 from "../data/structures/beehive";
+import * as f311 from "../data/structures/compost-bin";
+import * as f312 from "../data/structures/greenhouse";
+import * as f313 from "../data/structures/jukebox";
+import * as f314 from "../data/structures/mysterious-shrine";
+import * as f315 from "../data/structures/nuclear-reactor";
+import * as f316 from "../data/structures/pest-cage";
+import * as f317 from "../data/structures/pond";
+import * as f318 from "../data/structures/portal";
+import * as f319 from "../data/structures/well";
+import * as f320 from "../data/talismans/acorn-token";
+import * as f321 from "../data/talismans/ankh-of-return";
+import * as f322 from "../data/talismans/bird-claw";
+import * as f323 from "../data/talismans/bone-bead";
+import * as f324 from "../data/talismans/cauldron-charm";
+import * as f325 from "../data/talismans/compass-rose";
+import * as f326 from "../data/talismans/copper-charm";
+import * as f327 from "../data/talismans/crown-shard";
+import * as f328 from "../data/talismans/crystal-eye";
+import * as f329 from "../data/talismans/deep-anchor";
+import * as f330 from "../data/talismans/diamond-band";
+import * as f331 from "../data/talismans/digested-shrimp";
+import * as f332 from "../data/talismans/ember-heart";
+import * as f333 from "../data/talismans/emerald-collar";
+import * as f334 from "../data/talismans/emerald-shard";
+import * as f335 from "../data/talismans/eye-of-the-watcher";
+import * as f336 from "../data/talismans/feather-cord";
+import * as f337 from "../data/talismans/fire-gem";
+import * as f338 from "../data/talismans/fishers-knot";
+import * as f339 from "../data/talismans/four-leaf-clover";
+import * as f340 from "../data/talismans/fox-fang";
+import * as f341 from "../data/talismans/frost-orb";
+import * as f342 from "../data/talismans/gem-chain";
+import * as f343 from "../data/talismans/heart-locket";
+import * as f344 from "../data/talismans/holy-sigil";
+import * as f345 from "../data/talismans/hourglass-bead";
+import * as f346 from "../data/talismans/jellybean-jar";
+import * as f347 from "../data/talismans/lantern-charm";
+import * as f348 from "../data/talismans/lucky-clover";
+import * as f349 from "../data/talismans/moonstone";
+import * as f350 from "../data/talismans/mysterious-effigy";
+import * as f351 from "../data/talismans/owl-feather";
+import * as f352 from "../data/talismans/owl-kings-plume";
+import * as f353 from "../data/talismans/pendant-of-ages";
+import * as f354 from "../data/talismans/rune-pebble";
+import * as f355 from "../data/talismans/scarab-charm";
+import * as f356 from "../data/talismans/seed-pouch-charm";
+import * as f357 from "../data/talismans/skull-ring";
+import * as f358 from "../data/talismans/snail-shell";
+import * as f359 from "../data/talismans/spider-eye";
+import * as f360 from "../data/talismans/storm-charm";
+import * as f361 from "../data/talismans/sunken-idol";
+import * as f362 from "../data/talismans/sunstone";
+import * as f363 from "../data/talismans/topaz-chip";
+import * as f364 from "../data/talismans/totem-of-the-deep";
+import * as f365 from "../data/talismans/wolf-tooth";
+import * as f366 from "../data/vendors/angler";
+import * as f367 from "../data/vendors/baker";
+import * as f368 from "../data/vendors/blacksmith";
+import * as f369 from "../data/vendors/farmer";
+import * as f370 from "../data/vendors/kat";
+import * as f371 from "../data/weapons/bronze-dagger";
+import * as f372 from "../data/weapons/claymore";
+import * as f373 from "../data/weapons/venomfang-dagger";
 
 /** Every file in `data/`, in content order. */
 export const DATA_FILES: readonly DataFile[] = [
@@ -570,184 +571,185 @@ export const DATA_FILES: readonly DataFile[] = [
     { path: "materials/combat/slime.ts", module: f190 },
     { path: "materials/combat/spider-fang.ts", module: f191 },
     { path: "materials/combat/sturdy-shell.ts", module: f192 },
-    { path: "materials/farming/beetle-shell.ts", module: f193 },
-    { path: "materials/farming/bloodmelon.ts", module: f194 },
-    { path: "materials/farming/carrot-seeds.ts", module: f195 },
-    { path: "materials/farming/carrot.ts", module: f196 },
-    { path: "materials/farming/compost.ts", module: f197 },
-    { path: "materials/farming/corn-seeds.ts", module: f198 },
-    { path: "materials/farming/corn.ts", module: f199 },
-    { path: "materials/farming/emberwheat.ts", module: f200 },
-    { path: "materials/farming/golden-scarab.ts", module: f201 },
-    { path: "materials/farming/grinning-gourd.ts", module: f202 },
-    { path: "materials/farming/hexroot.ts", module: f203 },
-    { path: "materials/farming/isotope.ts", module: f204 },
-    { path: "materials/farming/melon-seeds.ts", module: f205 },
-    { path: "materials/farming/melon.ts", module: f206 },
-    { path: "materials/farming/mite-dust.ts", module: f207 },
-    { path: "materials/farming/mouse-tail.ts", module: f208 },
-    { path: "materials/farming/potato.ts", module: f209 },
-    { path: "materials/farming/pumpkin-seeds.ts", module: f210 },
-    { path: "materials/farming/pumpkin.ts", module: f211 },
-    { path: "materials/farming/rainroot.ts", module: f212 },
-    { path: "materials/farming/seed-potato.ts", module: f213 },
-    { path: "materials/farming/stardust.ts", module: f214 },
-    { path: "materials/farming/sugarroot.ts", module: f215 },
-    { path: "materials/farming/veil-shard.ts", module: f216 },
-    { path: "materials/farming/wheat-seeds.ts", module: f217 },
-    { path: "materials/farming/wheat.ts", module: f218 },
-    { path: "materials/farming/worm-castings.ts", module: f219 },
-    { path: "materials/fishing/blue-shark-tooth.ts", module: f220 },
-    { path: "materials/fishing/eel-gel.ts", module: f221 },
-    { path: "materials/fishing/great-white-shark-tooth.ts", module: f222 },
-    { path: "materials/fishing/kraken-ink.ts", module: f223 },
-    { path: "materials/fishing/tiger-shark-tooth.ts", module: f224 },
-    { path: "materials/fishing/whole-trout.ts", module: f225 },
-    { path: "materials/foraging/bone-tree-wood.ts", module: f226 },
-    { path: "materials/foraging/mushrooms.ts", module: f227 },
-    { path: "materials/foraging/oak-logs.ts", module: f228 },
-    { path: "materials/mining/coal.ts", module: f229 },
-    { path: "materials/mining/gold-ore.ts", module: f230 },
-    { path: "materials/mining/iron-ore.ts", module: f231 },
-    { path: "materials/mining/ruby.ts", module: f232 },
-    { path: "materials/mining/titanium-ore.ts", module: f233 },
-    { path: "mayors/briar.ts", module: f234 },
-    { path: "mayors/luna.ts", module: f235 },
-    { path: "mayors/malphas.ts", module: f236 },
-    { path: "mayors/marlon.ts", module: f237 },
-    { path: "mayors/siegmoor.ts", module: f238 },
-    { path: "misc/fishing-net-plus-1.ts", module: f239 },
-    { path: "misc/fishing-net.ts", module: f240 },
-    { path: "misc/gilded-chest-key.ts", module: f241 },
-    { path: "misc/healing-draught.ts", module: f242 },
-    { path: "misc/rift-lens.ts", module: f243 },
-    { path: "misc/rusty-chest-key.ts", module: f244 },
-    { path: "misc/sluice-key.ts", module: f245 },
-    { path: "mutations/bloodmelon.ts", module: f246 },
-    { path: "mutations/emberwheat.ts", module: f247 },
-    { path: "mutations/grinning-gourd.ts", module: f248 },
-    { path: "mutations/hexroot.ts", module: f249 },
-    { path: "mutations/rainroot.ts", module: f250 },
-    { path: "mutations/sugarroot.ts", module: f251 },
-    { path: "pests/earthworm.ts", module: f252 },
-    { path: "pests/field-mouse.ts", module: f253 },
-    { path: "pests/glow-beetle.ts", module: f254 },
-    { path: "pests/hopper-beetle.ts", module: f255 },
-    { path: "pests/mite.ts", module: f256 },
-    { path: "pests/rift-locust.ts", module: f257 },
-    { path: "pests/shade-rat.ts", module: f258 },
-    { path: "pet-items/silk-collar.ts", module: f259 },
-    { path: "pets/tarantula.ts", module: f260 },
-    { path: "quests/fresh-off-the-fire.ts", module: f261 },
-    { path: "quests/rainy-day-fund.ts", module: f262 },
-    { path: "quests/slime-cull.ts", module: f263 },
-    { path: "quests/trial-1.ts", module: f264 },
-    { path: "recipes/combat/envenom.ts", module: f265 },
-    { path: "recipes/combat/shellbreaker-ring.ts", module: f266 },
-    { path: "recipes/combat/slime-grip-wraps.ts", module: f267 },
-    { path: "recipes/combat/venomfang-dagger.ts", module: f268 },
-    { path: "recipes/cooking/cook-carp.ts", module: f269 },
-    { path: "recipes/cooking/cook-catfish.ts", module: f270 },
-    { path: "recipes/cooking/cook-musky.ts", module: f271 },
-    { path: "recipes/cooking/cook-perch.ts", module: f272 },
-    { path: "recipes/cooking/cook-pike.ts", module: f273 },
-    { path: "recipes/cooking/cook-salmon.ts", module: f274 },
-    { path: "recipes/cooking/cook-sturgeon.ts", module: f275 },
-    { path: "recipes/cooking/cook-whiskers.ts", module: f276 },
-    { path: "recipes/cooking/grilled-trout.ts", module: f277 },
-    { path: "recipes/cooking/mushroom-stew.ts", module: f278 },
-    { path: "recipes/farming/card-chain-reaction.ts", module: f279 },
-    { path: "recipes/farming/card-exterminators-oath.ts", module: f280 },
-    { path: "recipes/fishing/fishing-net-plus-1.ts", module: f281 },
-    { path: "reforges/blessed.ts", module: f282 },
-    { path: "reforges/heavy.ts", module: f283 },
-    { path: "reforges/keen.ts", module: f284 },
-    { path: "reforges/light.ts", module: f285 },
-    { path: "reforges/pure.ts", module: f286 },
-    { path: "reforges/snazzy.ts", module: f287 },
-    { path: "reforges/violent.ts", module: f288 },
-    { path: "reforges/wise.ts", module: f289 },
-    { path: "rings/ember-ring.ts", module: f290 },
-    { path: "rings/emerald-band.ts", module: f291 },
-    { path: "rings/shellbreaker-ring.ts", module: f292 },
-    { path: "rods/ashwood-rod.ts", module: f293 },
-    { path: "rods/greenheart-rod.ts", module: f294 },
-    { path: "rods/ironwood-rod.ts", module: f295 },
-    { path: "rods/leviathan-rod.ts", module: f296 },
-    { path: "rods/twig-rod.ts", module: f297 },
-    { path: "room-styles/boss-den.ts", module: f298 },
-    { path: "room-styles/slime-pool.ts", module: f299 },
-    { path: "room-styles/sluice.ts", module: f300 },
-    { path: "statuses/burning.ts", module: f301 },
-    { path: "statuses/frozen.ts", module: f302 },
-    { path: "statuses/paralyzed.ts", module: f303 },
-    { path: "statuses/poisoned.ts", module: f304 },
-    { path: "statuses/shelled.ts", module: f305 },
-    { path: "statuses/spiced.ts", module: f306 },
-    { path: "statuses/venom-coat.ts", module: f307 },
-    { path: "statuses/well-fed.ts", module: f308 },
-    { path: "structures/beehive.ts", module: f309 },
-    { path: "structures/compost-bin.ts", module: f310 },
-    { path: "structures/greenhouse.ts", module: f311 },
-    { path: "structures/jukebox.ts", module: f312 },
-    { path: "structures/mysterious-shrine.ts", module: f313 },
-    { path: "structures/nuclear-reactor.ts", module: f314 },
-    { path: "structures/pest-cage.ts", module: f315 },
-    { path: "structures/pond.ts", module: f316 },
-    { path: "structures/portal.ts", module: f317 },
-    { path: "structures/well.ts", module: f318 },
-    { path: "talismans/acorn-token.ts", module: f319 },
-    { path: "talismans/ankh-of-return.ts", module: f320 },
-    { path: "talismans/bird-claw.ts", module: f321 },
-    { path: "talismans/bone-bead.ts", module: f322 },
-    { path: "talismans/cauldron-charm.ts", module: f323 },
-    { path: "talismans/compass-rose.ts", module: f324 },
-    { path: "talismans/copper-charm.ts", module: f325 },
-    { path: "talismans/crown-shard.ts", module: f326 },
-    { path: "talismans/crystal-eye.ts", module: f327 },
-    { path: "talismans/deep-anchor.ts", module: f328 },
-    { path: "talismans/diamond-band.ts", module: f329 },
-    { path: "talismans/digested-shrimp.ts", module: f330 },
-    { path: "talismans/ember-heart.ts", module: f331 },
-    { path: "talismans/emerald-collar.ts", module: f332 },
-    { path: "talismans/emerald-shard.ts", module: f333 },
-    { path: "talismans/eye-of-the-watcher.ts", module: f334 },
-    { path: "talismans/feather-cord.ts", module: f335 },
-    { path: "talismans/fire-gem.ts", module: f336 },
-    { path: "talismans/fishers-knot.ts", module: f337 },
-    { path: "talismans/four-leaf-clover.ts", module: f338 },
-    { path: "talismans/fox-fang.ts", module: f339 },
-    { path: "talismans/frost-orb.ts", module: f340 },
-    { path: "talismans/gem-chain.ts", module: f341 },
-    { path: "talismans/heart-locket.ts", module: f342 },
-    { path: "talismans/holy-sigil.ts", module: f343 },
-    { path: "talismans/hourglass-bead.ts", module: f344 },
-    { path: "talismans/jellybean-jar.ts", module: f345 },
-    { path: "talismans/lantern-charm.ts", module: f346 },
-    { path: "talismans/lucky-clover.ts", module: f347 },
-    { path: "talismans/moonstone.ts", module: f348 },
-    { path: "talismans/mysterious-effigy.ts", module: f349 },
-    { path: "talismans/owl-feather.ts", module: f350 },
-    { path: "talismans/owl-kings-plume.ts", module: f351 },
-    { path: "talismans/pendant-of-ages.ts", module: f352 },
-    { path: "talismans/rune-pebble.ts", module: f353 },
-    { path: "talismans/scarab-charm.ts", module: f354 },
-    { path: "talismans/seed-pouch-charm.ts", module: f355 },
-    { path: "talismans/skull-ring.ts", module: f356 },
-    { path: "talismans/snail-shell.ts", module: f357 },
-    { path: "talismans/spider-eye.ts", module: f358 },
-    { path: "talismans/storm-charm.ts", module: f359 },
-    { path: "talismans/sunken-idol.ts", module: f360 },
-    { path: "talismans/sunstone.ts", module: f361 },
-    { path: "talismans/topaz-chip.ts", module: f362 },
-    { path: "talismans/totem-of-the-deep.ts", module: f363 },
-    { path: "talismans/wolf-tooth.ts", module: f364 },
-    { path: "vendors/angler.ts", module: f365 },
-    { path: "vendors/baker.ts", module: f366 },
-    { path: "vendors/blacksmith.ts", module: f367 },
-    { path: "vendors/farmer.ts", module: f368 },
-    { path: "vendors/kat.ts", module: f369 },
-    { path: "weapons/bronze-dagger.ts", module: f370 },
-    { path: "weapons/claymore.ts", module: f371 },
-    { path: "weapons/venomfang-dagger.ts", module: f372 },
+    { path: "materials/combat/tiny-ember.ts", module: f193 },
+    { path: "materials/farming/beetle-shell.ts", module: f194 },
+    { path: "materials/farming/bloodmelon.ts", module: f195 },
+    { path: "materials/farming/carrot-seeds.ts", module: f196 },
+    { path: "materials/farming/carrot.ts", module: f197 },
+    { path: "materials/farming/compost.ts", module: f198 },
+    { path: "materials/farming/corn-seeds.ts", module: f199 },
+    { path: "materials/farming/corn.ts", module: f200 },
+    { path: "materials/farming/emberwheat.ts", module: f201 },
+    { path: "materials/farming/golden-scarab.ts", module: f202 },
+    { path: "materials/farming/grinning-gourd.ts", module: f203 },
+    { path: "materials/farming/hexroot.ts", module: f204 },
+    { path: "materials/farming/isotope.ts", module: f205 },
+    { path: "materials/farming/melon-seeds.ts", module: f206 },
+    { path: "materials/farming/melon.ts", module: f207 },
+    { path: "materials/farming/mite-dust.ts", module: f208 },
+    { path: "materials/farming/mouse-tail.ts", module: f209 },
+    { path: "materials/farming/potato.ts", module: f210 },
+    { path: "materials/farming/pumpkin-seeds.ts", module: f211 },
+    { path: "materials/farming/pumpkin.ts", module: f212 },
+    { path: "materials/farming/rainroot.ts", module: f213 },
+    { path: "materials/farming/seed-potato.ts", module: f214 },
+    { path: "materials/farming/stardust.ts", module: f215 },
+    { path: "materials/farming/sugarroot.ts", module: f216 },
+    { path: "materials/farming/veil-shard.ts", module: f217 },
+    { path: "materials/farming/wheat-seeds.ts", module: f218 },
+    { path: "materials/farming/wheat.ts", module: f219 },
+    { path: "materials/farming/worm-castings.ts", module: f220 },
+    { path: "materials/fishing/blue-shark-tooth.ts", module: f221 },
+    { path: "materials/fishing/eel-gel.ts", module: f222 },
+    { path: "materials/fishing/great-white-shark-tooth.ts", module: f223 },
+    { path: "materials/fishing/kraken-ink.ts", module: f224 },
+    { path: "materials/fishing/tiger-shark-tooth.ts", module: f225 },
+    { path: "materials/fishing/whole-trout.ts", module: f226 },
+    { path: "materials/foraging/bone-tree-wood.ts", module: f227 },
+    { path: "materials/foraging/mushrooms.ts", module: f228 },
+    { path: "materials/foraging/oak-logs.ts", module: f229 },
+    { path: "materials/mining/coal.ts", module: f230 },
+    { path: "materials/mining/gold-ore.ts", module: f231 },
+    { path: "materials/mining/iron-ore.ts", module: f232 },
+    { path: "materials/mining/ruby.ts", module: f233 },
+    { path: "materials/mining/titanium-ore.ts", module: f234 },
+    { path: "mayors/briar.ts", module: f235 },
+    { path: "mayors/luna.ts", module: f236 },
+    { path: "mayors/malphas.ts", module: f237 },
+    { path: "mayors/marlon.ts", module: f238 },
+    { path: "mayors/siegmoor.ts", module: f239 },
+    { path: "misc/fishing-net-plus-1.ts", module: f240 },
+    { path: "misc/fishing-net.ts", module: f241 },
+    { path: "misc/gilded-chest-key.ts", module: f242 },
+    { path: "misc/healing-draught.ts", module: f243 },
+    { path: "misc/rift-lens.ts", module: f244 },
+    { path: "misc/rusty-chest-key.ts", module: f245 },
+    { path: "misc/sluice-key.ts", module: f246 },
+    { path: "mutations/bloodmelon.ts", module: f247 },
+    { path: "mutations/emberwheat.ts", module: f248 },
+    { path: "mutations/grinning-gourd.ts", module: f249 },
+    { path: "mutations/hexroot.ts", module: f250 },
+    { path: "mutations/rainroot.ts", module: f251 },
+    { path: "mutations/sugarroot.ts", module: f252 },
+    { path: "pests/earthworm.ts", module: f253 },
+    { path: "pests/field-mouse.ts", module: f254 },
+    { path: "pests/glow-beetle.ts", module: f255 },
+    { path: "pests/hopper-beetle.ts", module: f256 },
+    { path: "pests/mite.ts", module: f257 },
+    { path: "pests/rift-locust.ts", module: f258 },
+    { path: "pests/shade-rat.ts", module: f259 },
+    { path: "pet-items/silk-collar.ts", module: f260 },
+    { path: "pets/tarantula.ts", module: f261 },
+    { path: "quests/fresh-off-the-fire.ts", module: f262 },
+    { path: "quests/rainy-day-fund.ts", module: f263 },
+    { path: "quests/slime-cull.ts", module: f264 },
+    { path: "quests/trial-1.ts", module: f265 },
+    { path: "recipes/combat/envenom.ts", module: f266 },
+    { path: "recipes/combat/shellbreaker-ring.ts", module: f267 },
+    { path: "recipes/combat/slime-grip-wraps.ts", module: f268 },
+    { path: "recipes/combat/venomfang-dagger.ts", module: f269 },
+    { path: "recipes/cooking/cook-carp.ts", module: f270 },
+    { path: "recipes/cooking/cook-catfish.ts", module: f271 },
+    { path: "recipes/cooking/cook-musky.ts", module: f272 },
+    { path: "recipes/cooking/cook-perch.ts", module: f273 },
+    { path: "recipes/cooking/cook-pike.ts", module: f274 },
+    { path: "recipes/cooking/cook-salmon.ts", module: f275 },
+    { path: "recipes/cooking/cook-sturgeon.ts", module: f276 },
+    { path: "recipes/cooking/cook-whiskers.ts", module: f277 },
+    { path: "recipes/cooking/grilled-trout.ts", module: f278 },
+    { path: "recipes/cooking/mushroom-stew.ts", module: f279 },
+    { path: "recipes/farming/card-chain-reaction.ts", module: f280 },
+    { path: "recipes/farming/card-exterminators-oath.ts", module: f281 },
+    { path: "recipes/fishing/fishing-net-plus-1.ts", module: f282 },
+    { path: "reforges/blessed.ts", module: f283 },
+    { path: "reforges/heavy.ts", module: f284 },
+    { path: "reforges/keen.ts", module: f285 },
+    { path: "reforges/light.ts", module: f286 },
+    { path: "reforges/pure.ts", module: f287 },
+    { path: "reforges/snazzy.ts", module: f288 },
+    { path: "reforges/violent.ts", module: f289 },
+    { path: "reforges/wise.ts", module: f290 },
+    { path: "rings/ember-ring.ts", module: f291 },
+    { path: "rings/emerald-band.ts", module: f292 },
+    { path: "rings/shellbreaker-ring.ts", module: f293 },
+    { path: "rods/ashwood-rod.ts", module: f294 },
+    { path: "rods/greenheart-rod.ts", module: f295 },
+    { path: "rods/ironwood-rod.ts", module: f296 },
+    { path: "rods/leviathan-rod.ts", module: f297 },
+    { path: "rods/twig-rod.ts", module: f298 },
+    { path: "room-styles/boss-den.ts", module: f299 },
+    { path: "room-styles/slime-pool.ts", module: f300 },
+    { path: "room-styles/sluice.ts", module: f301 },
+    { path: "statuses/burning.ts", module: f302 },
+    { path: "statuses/frozen.ts", module: f303 },
+    { path: "statuses/paralyzed.ts", module: f304 },
+    { path: "statuses/poisoned.ts", module: f305 },
+    { path: "statuses/shelled.ts", module: f306 },
+    { path: "statuses/spiced.ts", module: f307 },
+    { path: "statuses/venom-coat.ts", module: f308 },
+    { path: "statuses/well-fed.ts", module: f309 },
+    { path: "structures/beehive.ts", module: f310 },
+    { path: "structures/compost-bin.ts", module: f311 },
+    { path: "structures/greenhouse.ts", module: f312 },
+    { path: "structures/jukebox.ts", module: f313 },
+    { path: "structures/mysterious-shrine.ts", module: f314 },
+    { path: "structures/nuclear-reactor.ts", module: f315 },
+    { path: "structures/pest-cage.ts", module: f316 },
+    { path: "structures/pond.ts", module: f317 },
+    { path: "structures/portal.ts", module: f318 },
+    { path: "structures/well.ts", module: f319 },
+    { path: "talismans/acorn-token.ts", module: f320 },
+    { path: "talismans/ankh-of-return.ts", module: f321 },
+    { path: "talismans/bird-claw.ts", module: f322 },
+    { path: "talismans/bone-bead.ts", module: f323 },
+    { path: "talismans/cauldron-charm.ts", module: f324 },
+    { path: "talismans/compass-rose.ts", module: f325 },
+    { path: "talismans/copper-charm.ts", module: f326 },
+    { path: "talismans/crown-shard.ts", module: f327 },
+    { path: "talismans/crystal-eye.ts", module: f328 },
+    { path: "talismans/deep-anchor.ts", module: f329 },
+    { path: "talismans/diamond-band.ts", module: f330 },
+    { path: "talismans/digested-shrimp.ts", module: f331 },
+    { path: "talismans/ember-heart.ts", module: f332 },
+    { path: "talismans/emerald-collar.ts", module: f333 },
+    { path: "talismans/emerald-shard.ts", module: f334 },
+    { path: "talismans/eye-of-the-watcher.ts", module: f335 },
+    { path: "talismans/feather-cord.ts", module: f336 },
+    { path: "talismans/fire-gem.ts", module: f337 },
+    { path: "talismans/fishers-knot.ts", module: f338 },
+    { path: "talismans/four-leaf-clover.ts", module: f339 },
+    { path: "talismans/fox-fang.ts", module: f340 },
+    { path: "talismans/frost-orb.ts", module: f341 },
+    { path: "talismans/gem-chain.ts", module: f342 },
+    { path: "talismans/heart-locket.ts", module: f343 },
+    { path: "talismans/holy-sigil.ts", module: f344 },
+    { path: "talismans/hourglass-bead.ts", module: f345 },
+    { path: "talismans/jellybean-jar.ts", module: f346 },
+    { path: "talismans/lantern-charm.ts", module: f347 },
+    { path: "talismans/lucky-clover.ts", module: f348 },
+    { path: "talismans/moonstone.ts", module: f349 },
+    { path: "talismans/mysterious-effigy.ts", module: f350 },
+    { path: "talismans/owl-feather.ts", module: f351 },
+    { path: "talismans/owl-kings-plume.ts", module: f352 },
+    { path: "talismans/pendant-of-ages.ts", module: f353 },
+    { path: "talismans/rune-pebble.ts", module: f354 },
+    { path: "talismans/scarab-charm.ts", module: f355 },
+    { path: "talismans/seed-pouch-charm.ts", module: f356 },
+    { path: "talismans/skull-ring.ts", module: f357 },
+    { path: "talismans/snail-shell.ts", module: f358 },
+    { path: "talismans/spider-eye.ts", module: f359 },
+    { path: "talismans/storm-charm.ts", module: f360 },
+    { path: "talismans/sunken-idol.ts", module: f361 },
+    { path: "talismans/sunstone.ts", module: f362 },
+    { path: "talismans/topaz-chip.ts", module: f363 },
+    { path: "talismans/totem-of-the-deep.ts", module: f364 },
+    { path: "talismans/wolf-tooth.ts", module: f365 },
+    { path: "vendors/angler.ts", module: f366 },
+    { path: "vendors/baker.ts", module: f367 },
+    { path: "vendors/blacksmith.ts", module: f368 },
+    { path: "vendors/farmer.ts", module: f369 },
+    { path: "vendors/kat.ts", module: f370 },
+    { path: "weapons/bronze-dagger.ts", module: f371 },
+    { path: "weapons/claymore.ts", module: f372 },
+    { path: "weapons/venomfang-dagger.ts", module: f373 },
 ];

@@ -5,7 +5,7 @@ export default {
     name: "Giant River Crab",
     sprite: "giant-river-crab",
     tier: 1,
-    stats: { maxHealth: 22, attack: 13, defense: 3, speed: 8 },
+    stats: { maxHealth: 30, attack: 16, defense: 3, speed: 8 },
     moves: [
         {
             id: "pinch",
@@ -25,6 +25,13 @@ export default {
             name: "Shell Up",
             weight: 1,
             actions: [{ type: "applyStatus", to: "self", status: "shelled" }],
+        },
+        {
+            // Claws up: soaks the next hits until its next turn.
+            id: "claw-guard",
+            name: "Claw Guard",
+            weight: 1,
+            actions: [{ type: "guard", to: "self", amount: 8 }],
         },
     ],
     loot: [

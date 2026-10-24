@@ -27,7 +27,8 @@ describe("player", () => {
         const kit = GAME_CONFIG["starter-kit"];
         expect(state.inventory.map((entry) => entry.itemId).sort()).toEqual(kit.items.map((entry) => entry.itemId).sort());
         const dagger = state.inventory.find((entry) => entry.itemId === "bronze-dagger");
-        expect(state.equipment).toEqual({ mainHand: dagger?.id });
+        const shield = state.inventory.find((entry) => entry.itemId === "plank-shield");
+        expect(state.equipment).toEqual({ mainHand: dagger?.id, offHand: shield?.id });
         expect(state.hands.combat).toHaveLength(2);
         expect(state.hands.fishing).toHaveLength(4);
         expect(state.hands.farming).toHaveLength(5);
@@ -46,6 +47,7 @@ describe("player", () => {
         const state = await read();
         const dagger = state.inventory.find((entry) => entry.itemId === "bronze-dagger")!;
         const rod = state.inventory.find((entry) => entry.itemId === "twig-rod")!;
+        const shield = state.inventory.find((entry) => entry.itemId === "plank-shield")!;
         const slot = (name: string) => path(me.equipmentSlot, { slot: name });
         const hand = path(me.hand, { skill: "combat" });
 
@@ -56,8 +58,8 @@ describe("player", () => {
         // The active loadout (Combat) follows what's worn.
         expect(rodIn.body.wardrobe.loadouts[0]?.equipment.mainHand).toBe(rod.id);
         const emptied = await call<GeoMeResponse>("PUT", slot("mainHand"), token, { inventoryId: null });
-        expect(emptied.body.equipment).toEqual({});
-        expect(emptied.body.wardrobe.loadouts[0]?.equipment).toEqual({});
+        expect(emptied.body.equipment).toEqual({ offHand: shield.id });
+        expect(emptied.body.wardrobe.loadouts[0]?.equipment).toEqual({ offHand: shield.id });
 
         expect((await call("PUT", hand, token, { inventoryIds: [dagger.id] })).status).toBe(400);
         const fishingCard = state.hands.fishing![0]!;

@@ -504,10 +504,15 @@ export type EnemyMove = {
     id: string;
     /** Shown when it's used. */
     name: string;
-    /** Against its other moves: 3 vs 1 = 75% / 25%. */
+    /** Against its other moves: 3 vs 1 = 75% / 25%. 0 = only ever a move's `next`. */
     weight: number;
     /** What it does. `other` is the player. */
     actions: Action[];
+    /**
+     * The id of the move it always makes next, shown as its next intent:
+     * a wind-up (Charge) that a big hit (Gore, weight 0) follows.
+     */
+    next?: string;
 };
 
 export type Enemy = {

@@ -326,8 +326,11 @@ export type FoodDef = {
 export type EnemyMove = {
     id: string;
     name: string;
+    /** 0 = never picked by weight, only as another move's `next`. */
     weight: number;
     actions: Action[];
+    /** The move it always makes next, e.g. a Charge before a Gore. */
+    next?: string;
 };
 
 // ---------------------------------------------------------------------------

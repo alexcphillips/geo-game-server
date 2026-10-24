@@ -443,6 +443,21 @@ describe("enemy intents", () => {
         assert.equal(intentOf(state), intentOf(start.state));
     });
 
+    it("follows a wind-up with its next move, which never comes up by weight", () => {
+        const boar = spider({
+            moves: [
+                { id: "charge", name: "Charge", weight: 1, actions: [], next: "gore" },
+                { id: "gore", name: "Gore", weight: 0, actions: [{ type: "attack", to: "other", amount: { stat: "attack" } }] },
+            ],
+        });
+        for (let seed = 1; seed <= 10; seed++) {
+            const start = createBattle([fast(), boar], seed, content());
+            assert.equal(intentOf(start.state), "charge");
+            const { state } = playCard(start.state, content(), { cardInstanceId: "c0" });
+            assert.equal(intentOf(state), "gore");
+        }
+    });
+
     it("previews each hit after the player's defense, and what lands on the enemy itself", () => {
         const flurry = spider({
             moves: [

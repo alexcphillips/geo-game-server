@@ -21,8 +21,9 @@ Model: `Enemy` in `#geo/models` (`content/models.ts`). Hover any field in the ed
 | `barrier` | whole number ≥ 1 | no | A barrier it spawns with: soaks that much damage (after guard, before health) until broken. Moves can cast more with the [`barrier` action](../EFFECTS.md#actions). |
 | `moves` | list of moves (at least 1) | yes | Each turn it picks one by weight. |
 | `moves[].id`, `.name` | text | yes | `name` is shown when it's used. |
-| `moves[].weight` | number > 0 | yes | Against its other moves: 3 vs 1 = 75% / 25%. |
+| `moves[].weight` | number ≥ 0 | yes | Against its other moves: 3 vs 1 = 75% / 25%. 0 = never picked by weight, only as a `next` (at least one move needs more than 0). |
 | `moves[].actions` | list of [actions](../EFFECTS.md#actions) | yes | What the move does. `other` is the player. |
+| `moves[].next` | a move id | no | The move it always makes next, shown as its next intent: a wind-up (Charge) and the big hit it leads to (Gore, weight 0). |
 | `effects` | list of [effects](../EFFECTS.md#effects-when-x-if-y-maybe-do-z) | no | Innate rules, e.g. poisons on hit, or enrages below half health. |
 | `loot` | list of `{ itemId, chance, quantity: { min, max } }` | no | Each rolled on its own on a win. `chance` 0–1. |
 | `coins` | `{ min, max }` | no | Coins on a kill, inclusive. |

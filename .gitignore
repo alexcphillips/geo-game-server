@@ -151,3 +151,5 @@ vite.config.ts.timestamp-*
 # Cloudflare: local secrets and wrangler state
 .dev.vars
 .wrangler/
+
+.claude/settings.local.json

@@ -411,8 +411,9 @@ const EnemyFile = z.strictObject({
             z.strictObject({
                 id: z.string().min(1),
                 name: z.string().min(1),
-                weight: z.number().positive(),
+                weight: z.number().min(0),
                 actions: z.array(ActionSchema),
+                next: z.string().min(1).optional(),
             }),
         )
         .min(1),

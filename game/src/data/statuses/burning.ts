@@ -13,7 +13,10 @@ export default {
                 {
                     type: "damage",
                     to: "self",
-                    amount: { flat: 3, perStack: true },
+                    // 3% of the burning fighter's max health a stack, so it keeps up as health grows.
+                    // TODO when Fireball is obtainable: a %-max-health burn shreds big bosses; give
+                    // them a cap or a resistance.
+                    amount: { stat: "maxHealth", multiplier: 0.03, perStack: true },
                     element: "fire",
                     ignoreDefense: true,
                 },

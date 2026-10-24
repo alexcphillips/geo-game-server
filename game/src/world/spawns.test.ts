@@ -141,11 +141,9 @@ describe("spawns", () => {
             for (const { enemyId } of spawnable) assert.ok(APP_SPRITES.some((sprite) => sprite === CONTENT.enemies[enemyId]?.sprite), enemyId);
         });
 
-        // Off for now (2026-10-21): the farming habitat has had no enemies since the
-        // slime removals. Turn back on once it has some (noted in the backend TODO doc).
-        // it("give every habitat someone to spawn", () => {
-        //     for (const [habitat, table] of Object.entries(HABITAT_ENEMIES)) assert.ok(table.length > 0, habitat);
-        // });
+        it("give every habitat someone to spawn", () => {
+            for (const [habitat, table] of Object.entries(HABITAT_ENEMIES)) assert.ok(table.length > 0, habitat);
+        });
     });
 
     describe("by tier", () => {
